@@ -1,0 +1,32 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Local temp / logs
+*.tmp
+*.temp
+*.log
+*.bak
+
+# Archive artifacts
+*.zip
+
+# Local onboarding / personal notes
+ONBOARDING.md
+docs/ONBOARDING.md
+
+# Agent/tool runtime artifacts
+.omc/
+.codex/
+
+# Prevent accidental project-specific log migration into the kit
+/docs/communication/
+/docs/backups/
+/docs/**/issues/ISS_*/
+/docs/**/ISS_*/
+/docs/**/*_Issue_Report*.md
+/docs/**/*_Issue_Report.assets/
