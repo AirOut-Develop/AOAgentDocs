@@ -1,6 +1,7 @@
 # 000_{IssueName}_Master_Report (템플릿)
 
-**이슈 ID:** {NNN}
+**이슈 ID:** ISS-{hash}
+**부모 작업:** {WRK-hash 또는 "없음(S)"}
 **주제:** {IssueName}
 **작성일:** {YYYY-MM-DD}
 **상태:** {진행중 / 차단됨 / 완료됨}

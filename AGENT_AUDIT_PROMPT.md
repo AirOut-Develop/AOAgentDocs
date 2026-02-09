@@ -1,4 +1,4 @@
-# 🕵️ Agent Audit Request Prompt (AOAgentDocs v1.1.0)
+# 🕵️ Agent Audit Request Prompt (AOAgentDocs v1.1.1)
 
 You are an expert **Software Architect & Documentation Auditor**.
 Your task is to review the **Antigravity Standard Documentation System** (designed for AI Agent collaboration) and provide critical feedback.
@@ -8,29 +8,30 @@ This documentation system (`AOAgentDocs`) is designed to standardize how AI Agen
 
 **Core Philosophy:**
 - **Agent-First:** Instructions are optimized for LLM parsing (clear, structured, unambiguous).
-- **Modular:** Rules are split into `COMMON` (Version Control, Ethics) and `PLATFORM` (Android, Web).
+- **Dual-Track Communication:** Uses `WRK` (Work Reports) for progress and `ISS` (Issues) for problem-solving.
+- **Hash-Based ID:** Uses 6-digit hex hashes (SHA-256) for unique, collision-free document IDs.
 - **Enforceable:** A strict onboarding pipeline (Checklist -> Memory) ensures compliance.
 
 ## 2. Review Materials
 Please analyze the following files in the provided repository/folder structure:
 1.  **`CONTRIBUTING.md`**: The entry point. Does it effectively grab your attention and force you into the onboarding pipeline?
-2.  **`RULES/000_CHECKLIST_TEMPLATE.md`**: The "Ritual". Is it clear where you should copy this and how to fill it out?
-3.  **`RULES/000_INDEX.md`**: Does it clearly define priority (Platform > Common) to resolve conflicts?
-4.  **`folder structure`**: Is the separation of `COMMON` vs `PLATFORM` logical and scalable?
+2.  **`RULES/COMMON/COMMUNICATION.md`**: The core communication rules. Is the WRK+ISS hash system clear and collision-proof?
+3.  **`UPGRADE_PROMPT.txt`**: The automated upgrade script. Is the logic sound for refactoring existing projects?
+4.  **`folder structure`**: Is the separation of `works/`, `issues/`, and `END/` logical and scalable?
 
 ## 3. Audit Criteria (What to check)
 Please evaluate the system based on these 4 dimensions:
 
-### A. 🛡️ Robustness (Onboarding)
+### A. 🛡️ Robustness (Onboarding & ID)
 - Can an agent "skip" the rules? Is the pipeline strict enough?
-- Is the instruction to use *your own memory file* (e.g., `CLAUDE.md`) vs `docs/ONBOARDING.md` clear?
+- Is the hash generation rule (`YYMMDD+HHMMSS+random` SHA-256 prefix) sufficient to prevent collisions?
 
-### B. 🧱 Scalability (Modularity)
+### B. 🧱 Scalability (Modularity & Archive)
 - If we add a `rules/PLATFORM/WEB` folder later, will it break existing Android projects?
-- Is the `MIGRATION_PROMPT.txt` logic sound for setting up new projects?
+- Does the `END/` archive strategy effectively manage long-term project history?
 
 ### C. 🧠 Clarity (LLM Optimization)
-- Are there ambiguous instructions?
+- Are there ambiguous instructions in `WRK` vs `ISS` templates?
 - Are the filenames and directory structures intuitive for an AI?
 
 ## 4. Output Format

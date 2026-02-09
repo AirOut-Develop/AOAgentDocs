@@ -1,4 +1,4 @@
-[안티그래비티 표준 문서 시스템 이식 요청 프롬프트 (v3.3)]
+[안티그래비티 표준 문서 시스템 이식 요청 프롬프트 (v4.0)]
 
 ## 0. 프로젝트 설정
 - 대상 경로: `<INSERT_PROJECT_ROOT_PATH>`
@@ -15,21 +15,40 @@
 ## 3. communication 초기화
 아래 템플릿을 프로젝트의 `docs/communication/`으로 복사
 - `examples/communication/000_README_Communication_Guide.md`
-- `examples/communication/001_ISSUE_INDEX.md`
+- `examples/communication/001_INDEX.md`
 - `examples/communication/000_Master_Report_Template.md`
-- `examples/communication/ISS_YYMMDD_NNN_Name_Template.md`
+- `examples/communication/000_Work_Master_Report_Template.md`
+- `examples/communication/ISS_YYMMDD_NNN_hash_Flag_Name_Template.md`
+- `examples/communication/WRK_YYMMDD_NNN_hash_Name_Template.md`
 - `examples/communication/999_Issue_Completed_Template.md`
+- `examples/communication/999_Work_Completed_Template.md`
 - `examples/communication/assets/001_Attempt_Log_Template.md`
 - `examples/communication/assets/raw_logs.txt`
+- `docs/communication/works/` 폴더 생성
 - `docs/communication/issues/` 폴더 생성
+- `docs/communication/END/` 폴더 생성
 
 ## 4. 운영 규칙
-- 루트(`docs/communication/`)에는 인덱스/가이드/템플릿과 `issues/`만 유지
-- 실제 이슈 폴더: `issues/ISS_YYMMDD_NNN_Name`
-- 파일 네이밍: `000_{IssueName}_Master_Report.md`, `001_...`, `002_...`, `999_Issue_Completed.md`
-- 이슈 완료 시 인덱스 완료 이슈 표 갱신 필수
+- 루트(`docs/communication/`)에는 인덱스/가이드/템플릿과 `works/`, `issues/`, `END/`만 유지
+- 작업 폴더: `works/WRK_YYMMDD_NNN_hash_Name`
+- 이슈 폴더: `issues/ISS_YYMMDD_NNN_hash_Flag_Name`
+  - `Flag`: `L`(WRK 연계, 부모 해시 필수) / `S`(독립)
+- 해시: 6자리 hex (`YYMMDD+HHMMSS+random 2자리`의 SHA-256 앞 6자리)
+- NNN: 해당 날짜 내 순서 (WRK/ISS 독립 카운트)
+- 완료 시 `999_Completed.md` 작성 후 즉시 `END/`로 이동
+- 인덱스 `001_INDEX.md`는 WRK+ISS 통합 관리, 항상 최신 유지
 
 ## 5. 완료 검증
 - 링크 무결성
 - 네이밍 규칙 준수
 - 인덱스(활성/완료) 최신화
+
+## 6. 버전 마커 설치
+- 프로젝트 루트에 `.aodocs_version` 파일을 생성합니다.
+- 내용: 현재 설치한 AOAgentDocs 버전 (예: `1.2.0`)
+- 이 파일은 향후 `UPGRADE_PROMPT.txt`에서 버전 비교에 사용됩니다.
+- `.aodocs_version`이 `.gitignore`에 포함되지 않도록 확인합니다.
+
+## 7. 향후 업그레이드
+- AOAgentDocs가 업데이트되면 `UPGRADE_PROMPT.txt`를 사용하여 업그레이드합니다.
+- 이 파일(`MIGRATION_PROMPT.txt`)은 최초 설치 전용입니다.

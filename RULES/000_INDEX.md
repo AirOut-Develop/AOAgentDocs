@@ -18,8 +18,8 @@
 ### Android (Base)
 - [ARCHITECTURE.md](./PLATFORM/ANDROID/ARCHITECTURE.md): 안드로이드 아키텍처, MVVM, 레이어 구조
 
-### Web (Future)
-- 아직 정의되지 않음
+### Web (Placeholder)
+- [ARCHITECTURE.md](./PLATFORM/WEB/ARCHITECTURE.md): 웹 아키텍처 (예정)
 
-### Server (Future)
-- 아직 정의되지 않음
+### Server (Placeholder)
+- [ARCHITECTURE.md](./PLATFORM/SERVER/ARCHITECTURE.md): 서버 아키텍처 (예정)

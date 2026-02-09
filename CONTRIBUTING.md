@@ -25,9 +25,11 @@
 <!-- [PLATFORM_RULES_END] -->
 
 ## 🚀 시작하기
-`AOAgentDocs` 적용/작업 시작은 `MIGRATION_PROMPT.txt`를 먼저 읽고 진입합니다.
+신규 프로젝트에 `AOAgentDocs`를 적용하려면 `MIGRATION_PROMPT.txt`를 먼저 읽고 진입합니다.
+기존 프로젝트를 업그레이드하려면 `UPGRADE_PROMPT.txt`를 사용합니다.
 
-- 이식 절차(진입점): `MIGRATION_PROMPT.txt`
+- 최초 설치: `MIGRATION_PROMPT.txt`
+- 업그레이드: `UPGRADE_PROMPT.txt`
 - 소통 템플릿: `examples/communication/`
 - 환경 템플릿: `examples/PROJECT_ENV_Template.md`
 
@@ -36,7 +38,7 @@
 - 변경 이력: `CHANGELOG.md`
 - 릴리즈 절차: `RELEASE_POLICY.md`
 - 중장기 계획: `ROADMAP.md`
-- 패키지 생성: `scripts/release_package.sh`
+- 패키지 생성: `scripts/release_package.sh` (Linux/WSL), `scripts/release_package.ps1` (Windows)
 - 릴리즈 게이트: 보안 감사 완료 후에만 태그/배포 진행
 
 ## 🔐 이슈/PR 보안 게이트

@@ -1,7 +1,8 @@
 # 999_Issue_Completed.md (템플릿)
 
-**이슈 ID:** {NNN}
-**이슈 폴더:** {issues/ISS_YYMMDD_NNN_Name}
+**이슈 ID:** ISS-{hash}
+**이슈 폴더:** {issues/ISS_YYMMDD_NNN_hash_Flag_Name}
+**부모 작업:** {WRK-hash 또는 "없음(S)"}
 **완료일:** {YYYY-MM-DD}
 **완료 판정:** 완료
 
@@ -15,5 +16,7 @@
 ## 잔여 리스크
 - 없음 / 후속 과제 기재
 
-## 인덱스 반영
-- `001_ISSUE_INDEX.md` 완료 이슈 표 반영 여부 확인
+## 완료 후 처리
+- [ ] `END/`로 폴더 이동
+- [ ] `001_INDEX.md` 완료 항목 갱신
+- [ ] **L 플래그**: 부모 WRK 마스터 리포트의 관련 이슈 상태 갱신
