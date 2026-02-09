@@ -21,26 +21,64 @@
 
 ### 🆕 최초 설치 (신규 프로젝트)
 
-```bash
-# 1. 저장소 clone 또는 릴리즈 다운로드
-git clone https://github.com/AirOut-Develop/AOAgentDocs.git
+<details>
+<summary>🤖 <b>에이전트에게 설치 요청하기 (Click to expand)</b></summary>
 
-# 2. 대상 프로젝트에 복사
-cp -r AOAgentDocs/{CONTRIBUTING.md,RULES,examples} <YOUR_PROJECT>/
+```text
+[AOAgentDocs 신규 설치 요청]
+
+이 프로젝트에 안티그래비티 표준 문서 시스템(AOAgentDocs v1.2.0)을 구축해주세요.
+
+1. 설치
+   git clone https://github.com/AirOut-Develop/AOAgentDocs.git
+   AOAgentDocs의 CONTRIBUTING.md, RULES/, examples/ 를 프로젝트 루트로 복사
+
+2. 초기화
+   AOAgentDocs/MIGRATION_PROMPT.txt 를 읽고 초기 설정을 수행하세요.
+   - docs/communication/ 구조 생성 (works/, issues/, END/, 001_INDEX.md)
+   - .aodocs_version 마커 파일 생성 (내용: 1.2.0)
+
+3. 완료 보고
+   - 구축된 docs 폴더 구조를 트리 형태로 보여주세요.
 ```
+</details>
 
-3. `MIGRATION_PROMPT.txt`를 에이전트에게 전달하여 이식 절차 수행
-4. `CONTRIBUTING.md`의 작업 시작 파이프라인을 따라 진입
+1. 위 프롬프트를 복사하여 에이전트에게 전달
+2. 또는 수동 설치:
+   ```bash
+   git clone https://github.com/AirOut-Develop/AOAgentDocs.git
+   cp -r AOAgentDocs/{CONTRIBUTING.md,RULES,examples} <YOUR_PROJECT>/
+   ```
+3. `MIGRATION_PROMPT.txt`에 따라 이식 절차 수행
 
 ### 🔄 업그레이드 (기존 프로젝트)
 
-```bash
-# 1. AOAgentDocs 최신화
-cd AOAgentDocs && git pull
-```
+<details>
+<summary>🤖 <b>에이전트에게 업그레이드 요청하기 (Click to expand)</b></summary>
 
-2. `UPGRADE_PROMPT.txt`를 에이전트에게 전달
-3. 에이전트가 자동으로 **버전 비교 → 리팩토링 → 마커 갱신** 수행
+```text
+[AOAgentDocs 업그레이드 요청]
+
+현재 프로젝트의 문서 시스템을 최신 AOAgentDocs v1.2.0 체계로 업그레이드해주세요.
+가장 중요한 변경점은 'WRK(작업 보고서) 체계 도입'과 '해시 기반 문서 ID' 입니다.
+
+1. AOAgentDocs 저장소 최신화
+   git clone https://github.com/AirOut-Develop/AOAgentDocs.git (이미 있으면 git pull)
+
+2. 업그레이드 실행
+   AOAgentDocs/UPGRADE_PROMPT.txt 내용을 읽고 지침에 따라 다음을 수행하세요:
+   - .aodocs_version 버전 비교 (v1.1.1 -> v1.2.0)
+   - 규칙 파일(RULES/COMMON/COMMUNICATION.md 등) 및 템플릿 갱신
+   - 기존 ISS-NNN 이슈들을 새로운 해시 체계(ISS_YYMMDD_NNN_hash_Flag_Name)로 리팩토링
+   - works/ 폴더 생성 및 END/ 아카이브 처리
+
+3. 완료 후 보고
+   - 변경된 폴더 구조와 리팩토링된 이슈 목록을 보고해주세요.
+```
+</details>
+
+1. 위 프롬프트를 복사하여 에이전트에게 전달
+2. 에이전트가 자동으로 **버전 비교 → 리팩토링 → 마커 갱신** 수행
 
 ---
 
