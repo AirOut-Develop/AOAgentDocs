@@ -116,6 +116,19 @@ class DistributionTests(unittest.TestCase):
             self.assertIn(version, (ROOT / name).read_text(), name)
         self.assertIn(f"git clone --branch aodocs/v{version} --depth 1", (ROOT / "README.md").read_text())
 
+    def test_session_handoff_rule_and_status_template_are_distributed(self):
+        files = set(json.loads((ROOT / "kit-files.json").read_text())["files"])
+        self.assertIn("RULES/COMMON/SESSION_HANDOFF.md", files)
+        self.assertIn("examples/lifecycle/STATUS.md", files)
+        rule = (ROOT / "RULES/COMMON/SESSION_HANDOFF.md").read_text()
+        template = (ROOT / "examples/lifecycle/STATUS.md").read_text()
+        self.assertIn("docs/STATUS.md", rule)
+        self.assertIn("registry", rule)
+        self.assertIn("다음 행동", rule)
+        self.assertIn("상태 정본", template)
+        self.assertIn("0건", template)
+        self.assertIn("미검증", template)
+
     def test_documented_templates_register_without_claiming_product_success(self):
         self.packager()(ROOT)
         with tempfile.TemporaryDirectory() as tmp:

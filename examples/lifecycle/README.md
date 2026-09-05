@@ -2,7 +2,7 @@
 
 양식은 복사 전용이다. 설치기는 제품 문서를 만들거나 완료 상태를 채우지 않는다.
 [PRD](PRD.md), [설계](DESIGN.md), [ADR](ADR.md), [계획](PLAN.md),
-[검증](VERIFICATION.md), [릴리스](RELEASE.md) 중 필요한 것만 사용한다.
+[검증](VERIFICATION.md), [릴리스](RELEASE.md), [현재 작업](STATUS.md) 중 필요한 것만 사용한다.
 
 1. PRD.md를 제품의 `docs/prd/example.md`로, PLAN.md를 `docs/plans/example.md`로,
    VERIFICATION.md를 `docs/verification/example.md`로 복사한다. 실제 내용을 작성한다.

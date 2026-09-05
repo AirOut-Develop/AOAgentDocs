@@ -65,6 +65,9 @@ inline 이미지와 명시적/축약형 이름 참조(`[text][ref]`, `[ref][]`)�
 
 [양식/JSON 예시](../../examples/lifecycle/README.md)를 참고한다.
 
+장기 작업의 재개 대기열과 현황보고 규칙은 [SESSION_HANDOFF](SESSION_HANDOFF.md)를 따른다.
+STATUS는 registry와 정본 문서를 연결하는 대시보드이며 독립 상태 정본이 아니다.
+
 ## Git 바이트 보존 (1.3.1)
 
 설치기가 `.aodocs/.gitattributes`를 관리한다. `.gitattributes -text`로 속성 파일 자체를,

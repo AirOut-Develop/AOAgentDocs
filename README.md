@@ -1,6 +1,6 @@
 # AOAgentDocs
 
-**1.3.1 · PRD부터 개발·검증·배포까지 연결하는 재사용 문서 킷**
+**1.4.0 · PRD부터 개발·검증·배포·다음 세션까지 연결하는 재사용 문서 킷**
 
 WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실제 검증 근거를 연결합니다.
 서버/iOS/Android/Web을 함께 선택할 수 있습니다. UI 프레임워크나 에이전트 실행 도구를 강제하지 않습니다.
@@ -10,7 +10,7 @@ WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실�
 Python **3.10 이상**이 필요하며 추가 패키지는 없습니다. 먼저 신뢰할 수 있는 소스를 확인하세요.
 
 ```bash
-git clone --branch aodocs/v1.3.1 --depth 1 https://github.com/AirOut-Develop/AOAgentDocs.git
+git clone --branch aodocs/v1.4.0 --depth 1 https://github.com/AirOut-Develop/AOAgentDocs.git
 cd AOAgentDocs
 # 태그가 고정된 검토 사본에서 설치합니다. 새 버전은 새 다운로드에서 먼저 검토하세요.
 python3 scripts/aodocs.py install /path/to/project --profile server --profile ios
@@ -41,6 +41,10 @@ ZIP을 받은 경우 `AOAgentDocs/`를 프로젝트 **바깥**에 풀고 같은 
 `.aodocs/kit/RULES/COMMON/DOCUMENT_LIFECYCLE.md`와 `.aodocs/documents.json` 링크를 추가하세요.
 `.aodocs/`는 공유할 문서/도구이므로 Git에 추적합니다. 민감정보를 넣지 마세요.
 
+장기 작업은 [세션 인수인계 규칙](RULES/COMMON/SESSION_HANDOFF.md)에 따라
+`examples/lifecycle/STATUS.md`를 프로젝트의 `docs/STATUS.md`로 복사해 작성합니다.
+설치기는 프로젝트 상태를 알 수 없으므로 STATUS를 자동 생성하거나 덮어쓰지 않습니다.
+
 ## 설치 후 첫 PRD 등록
 
 1. [생명주기 규칙](RULES/COMMON/DOCUMENT_LIFECYCLE.md)을 읽습니다.
@@ -55,7 +59,7 @@ ZIP을 받은 경우 `AOAgentDocs/`를 프로젝트 **바깥**에 풀고 같은 
 ## 에이전트에게 요청하기
 
 ```text
-AOAgentDocs 1.3을 이 프로젝트에 비파괴 설치해주세요.
+AOAgentDocs 1.4를 이 프로젝트에 비파괴 설치해주세요.
 원본 킷은 프로젝트 외부에 두고 install dry-run부터 실행하세요.
 기존 지침/이력은 덮어쓰지 말고 활성 플랫폼과 계획 플랫폼을 분리하세요.
 제품 PRD 한 건을 실제 계획·이슈·검증 기록과 연결하고 validate를 실행하세요.
@@ -85,7 +89,7 @@ AOAgentDocs 1.3을 이 프로젝트에 비파괴 설치해주세요.
 ```bash
 python3 -m unittest discover -s tests -v
 python3 scripts/release_package.py
-# dist/AOAgentDocs_v1.3.1.zip
+# dist/AOAgentDocs_v1.4.0.zip
 ```
 
 [배포 정책](RELEASE_POLICY.md) · [변경 이력](CHANGELOG.md) · [로드맵](ROADMAP.md)
@@ -103,3 +107,9 @@ Windows Git `core.autocrlf`가 관리 파일의 바이트를 바꿔 hash 검사�
 1.3.0 태그는 보존하고 1.3.1에서 실제 Git add/commit/clone 후 무결성을 검증했습니다.
 이미 줄바꿈이 변환된 1.3.0 checkout도 기존 hash와 정확히 대조해 줄바꿈만 복구합니다.
 dry-run에 `repair line endings`가 표시되며 실제 내용 변경은 자동으로 덮어쓰지 않습니다.
+
+### 1.4.0 세션 재개 체계
+
+`docs/STATUS.md`는 지금 바로 할 일 한 개, 전체 등록 문서 현황, 완료 범위, 후속 대기열과
+미검증 항목을 연결합니다. 상태 정본은 계속 registry와 각 문서이며 STATUS는 대시보드입니다.
+현황보고 때 PRD/PLAN/WRK/ISS/verification/release 전체와 0건인 유형까지 표시합니다.

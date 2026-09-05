@@ -1,4 +1,4 @@
-[AOAgentDocs 1.3.1 신규/선택 이관]
+[AOAgentDocs 1.4.0 신규/선택 이관]
 
 대상 프로젝트와 원본 킷의 Git root/remote/dirty 상태를 먼저 확인한다.
 기존 프로젝트 지침을 읽고 원본 킷은 대상 디렉터리 바깥에서 실행한다.
@@ -22,3 +22,9 @@ root의 옛 .aodocs_version은 legacy root 복사본의 버전이다. 새 설치
 
 1.3.1은 .aodocs/.gitattributes도 설치한다. 속성 파일과 kit 바이트의 Git 자동 줄바꿈 변환을 방지한다.
 기존 속성 파일 내용이 다르면 덮어쓰지 않고 중단한다. 프로젝트 root .gitattributes는 변경하지 않는다.
+
+## 1.4.0 선택 도입
+
+장기 작업 프로젝트라면 `.aodocs/kit/examples/lifecycle/STATUS.md`를 `docs/STATUS.md`로
+복사해 실제 활성 문서와 다음 행동을 작성한다. 기존 STATUS가 있으면 덮어쓰지 않고 병합한다.
+registry와 각 문서가 상태 정본이며 STATUS는 파생 대시보드임을 유지한다.

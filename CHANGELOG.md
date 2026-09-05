@@ -2,6 +2,18 @@
 
 이 문서는 AOAgentDocs의 릴리즈 이력을 관리합니다.
 
+## [1.4.0] - 2026-09-05
+### Added
+- `RULES/COMMON/SESSION_HANDOFF.md`: 새 세션 시작·종료·현황보고 규칙
+- `examples/lifecycle/STATUS.md`: 현재 작업·다음 행동·전체 문서 상태 대시보드 양식
+- 활성 문서가 0건인 유형과 미검증·보류·실제/제안 구조를 명시하는 보고 규약
+### Changed
+- CONTRIBUTING/체크리스트/문서 생명주기/설치 안내에서 STATUS를 선택적으로 연결
+- 설치기는 프로젝트 상태를 추측하지 않고 STATUS를 자동 생성·덮어쓰지 않음
+### Compatibility
+- 기존 registry, PRD/PLAN/WRK/ISS, root 규칙과 프로젝트 문서는 변경하지 않음.
+- 기존 프로젝트는 킷 업데이트 후 필요한 경우 양식을 복사해 명시적으로 도입.
+
 ## [1.3.1] - 2026-09-05
 ### Fixed
 - 첫 소비자에서 확인된 Git CRLF 정규화에 의한 관리 파일 hash 불일치

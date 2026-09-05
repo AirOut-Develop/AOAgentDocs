@@ -23,4 +23,5 @@
 - [ ] 작업 완료 전 빌드/테스트 등 검증을 수행합니다.
 
 - [ ] [제품 생명주기](COMMON/DOCUMENT_LIFECYCLE.md)를 확인하고 활성/계획 플랫폼을 구분했습니다.
+- [ ] 프로젝트에 `docs/STATUS.md`가 있다면 [세션 인수인계 규칙](COMMON/SESSION_HANDOFF.md)에 따라 확인했습니다.
 - [ ] iOS 대상이면 [iOS 지침](PLATFORM/IOS/ARCHITECTURE.md)을 확인했습니다.

@@ -55,3 +55,6 @@
 ## 9. 제품 요구사항 연결 (선택적 1.3 확장)
 [DOCUMENT_LIFECYCLE](DOCUMENT_LIFECYCLE.md)의 registry로 PRD/계획/검증과 연결합니다.
 기존 폴더/ID는 보존하고 새 PRD는 완료 시에도 고정 경로를 유지합니다.
+
+장기 작업의 다음 행동과 전체 등록 문서 현황은 [SESSION_HANDOFF](SESSION_HANDOFF.md)에 따라
+`docs/STATUS.md`에 요약할 수 있습니다. STATUS는 WRK/ISS나 registry를 대체하지 않습니다.

@@ -26,6 +26,7 @@
 
 ## 제품 생명주기
 - [DOCUMENT_LIFECYCLE.md](COMMON/DOCUMENT_LIFECYCLE.md) — PRD/계획/검증 연결
+- [SESSION_HANDOFF.md](COMMON/SESSION_HANDOFF.md) — 새 세션 재개·현황보고·다음 작업 대기열
 
 ## iOS
 - [ARCHITECTURE.md](PLATFORM/IOS/ARCHITECTURE.md) — 네이티브 적용 규칙

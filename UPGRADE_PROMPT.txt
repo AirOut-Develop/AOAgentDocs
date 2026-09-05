@@ -1,4 +1,4 @@
-[AOAgentDocs 1.3.1 비파괴 업그레이드]
+[AOAgentDocs 1.4.0 비파괴 업그레이드]
 
 1. 원본 킷 저장소의 remote/버전/변경 이력을 확인한다. 조직 포크에 git pull을 강제하지 않는다.
 2. 대상 .aodocs/manifest.json과 project.json을 확인한다. root .aodocs_version은 legacy 표시이므로 건드리지 않는다.
@@ -21,3 +21,7 @@ v1.2 root 복사 설치에서 올 때는 .aodocs/kit만 추가한다. legacy 파
 예외는 이미 Git 줄바꿈 변환을 겪은 정확히 1.3.0 설치본을 1.3.1 이상으로 올릴 때뿐이다.
 LF/CRLF 변환만으로 기존 manifest의 SHA-256과 정확히 일치하는 파일은 `repair line endings`로
 명시하고 복구한다. 실제 내용 수정, 다른 설치 버전, 동일 1.3.0 재설치는 여전히 충돌이다.
+
+1.4.0은 세션 인수인계 규칙과 STATUS 양식을 관리 킷에 추가한다. 대상 프로젝트의
+`docs/STATUS.md`는 사용자 소유이므로 installer가 만들거나 덮어쓰지 않는다.
+필요한 프로젝트만 양식을 복사하고 registry/원문에서 현재 상태를 확인해 채운다.

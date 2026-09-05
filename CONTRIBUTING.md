@@ -7,11 +7,13 @@
 3. `.aodocs/project.json`에 활성/계획 플랫폼을 구분한다.
 4. 작업 기록은 제품 저장소의 기존 docs에 남기고 registry에 연결한다.
 5. 일회성 온보딩 체크는 작업 문서에 기록한다. AGENTS/CLAUDE를 상태 파일로 바꾸지 않는다.
+6. 장기 작업은 `docs/STATUS.md`를 두고 새 세션 시작·종료 때 다음 행동을 갱신한다.
 
 ## 공통 규칙
 
 - [COMMUNICATION](RULES/COMMON/COMMUNICATION.md)
 - [DOCUMENT_LIFECYCLE](RULES/COMMON/DOCUMENT_LIFECYCLE.md)
+- [SESSION_HANDOFF](RULES/COMMON/SESSION_HANDOFF.md)
 - [VERSION_CONTROL_CONVENTION](RULES/COMMON/VERSION_CONTROL_CONVENTION.md)
 - [CODE_ETHICS](RULES/COMMON/CODE_ETHICS.md)
 
