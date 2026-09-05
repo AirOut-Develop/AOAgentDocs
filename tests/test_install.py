@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -75,6 +76,22 @@ class InstallTests(unittest.TestCase):
         self.apply([])
         project = json.loads((self.target / ".aodocs/project.json").read_text(encoding="utf-8"))
         self.assertEqual(["server"], project["platforms"])
+
+    def test_dot_target_uses_resolved_directory_name_as_project_id(self):
+        previous = Path.cwd()
+        try:
+            os.chdir(self.target)
+            install(self.source, Path("."), [], apply=True)
+        finally:
+            os.chdir(previous)
+
+        project = json.loads((self.target / ".aodocs/project.json").read_text(encoding="utf-8"))
+        self.assertEqual(self.target.name, project["project_id"])
+
+    def test_filesystem_root_target_is_rejected_instead_of_creating_blank_project_id(self):
+        filesystem_root = Path(self.target.anchor)
+        with self.assertRaisesRegex(ValueError, "non-empty name"):
+            install(self.source, filesystem_root, [], apply=False)
 
     def test_duplicate_profiles_are_deduplicated_preserving_order(self):
         self.apply(["ios", "server", "ios", "web", "server"])
@@ -289,6 +306,31 @@ class InstallTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             install(self.source, self.target, [], apply=True)
         self.assertEqual([], list(outside.iterdir()))
+
+    def test_accepts_symlink_ancestors_above_source_and_target_roots(self):
+        base = Path(self.temp_dir.name)
+        alias = base / "alias"
+        alias.symlink_to(base, target_is_directory=True)
+        other_target = base / "other-project"
+        other_target.mkdir()
+
+        install(self.source, alias / self.target.name, [], apply=True)
+        install(alias / self.source.name, other_target, [], apply=True)
+
+        self.assertTrue((self.target / ".aodocs/manifest.json").is_file())
+        self.assertTrue((other_target / ".aodocs/manifest.json").is_file())
+
+    def test_rejects_source_or_target_root_when_argument_itself_is_symlink(self):
+        base = Path(self.temp_dir.name)
+        source_alias = base / "source-alias"
+        target_alias = base / "target-alias"
+        source_alias.symlink_to(self.source, target_is_directory=True)
+        target_alias.symlink_to(self.target, target_is_directory=True)
+
+        with self.assertRaises(ValueError):
+            install(source_alias, self.target, [], apply=False)
+        with self.assertRaises(ValueError):
+            install(self.source, target_alias, [], apply=False)
 
     def test_same_version_still_checks_managed_hashes(self):
         self.apply()

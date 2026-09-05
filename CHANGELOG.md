@@ -8,6 +8,7 @@
 - iOS 규칙, 복수 활성/계획 플랫폼
 - 비파괴 namespaced 설치·upgrade 및 문서 검사 CLI (Python 표준 라이브러리)
 - installer/validator/ZIP 소비자 roundtrip 회귀 테스트
+- 계획 플랫폼의 허위 완료 방지, 관리 목록 일치/심볼릭 링크 경계 검사
 ### Changed
 - root 복사/덮어쓰기 대신 `.aodocs/kit` 설치를 기본 경로로 제공 (legacy 파일 보존)
 - 동일 Python packager와 명시 payload 목록으로 ZIP 생성, 로컬 산출물 혼입 방지

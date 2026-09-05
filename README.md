@@ -10,9 +10,9 @@ WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실�
 Python **3.10 이상**이 필요하며 추가 패키지는 없습니다. 먼저 신뢰할 수 있는 소스를 확인하세요.
 
 ```bash
-git clone https://github.com/AirOut-Develop/AOAgentDocs.git
+git clone --branch aodocs/v1.3.0 --depth 1 https://github.com/AirOut-Develop/AOAgentDocs.git
 cd AOAgentDocs
-# 정확한 버전은 태그 aodocs/v1.3.0 또는 검토한 커밋으로 고정하세요.
+# 태그가 고정된 검토 사본에서 설치합니다. 새 버전은 새 다운로드에서 먼저 검토하세요.
 python3 scripts/aodocs.py install /path/to/project --profile server --profile ios
 # 위 명령은 dry-run: 변경 목록만 확인합니다.
 python3 scripts/aodocs.py install /path/to/project --profile server --profile ios --apply

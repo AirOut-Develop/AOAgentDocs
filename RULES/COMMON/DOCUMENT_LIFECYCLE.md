@@ -43,6 +43,9 @@ passed 검증에는 command/environment/source_revision이 필요하다. 출력/
 waived는 reason/owner/expires_at이 필요하며 passed를 대신하지 못한다.
 done plan/work/issue와 released release는 passed evidence 최소 1개가 필요하고,
 해당 covers가 evidence covers의 합집합으로 충족돼야 한다.
+planned_platforms에만 있는 플랫폼은 passed 검증/done 작업/released 배포에 넣을 수 없다.
+승인된 PRD/설계가 미래 플랫폼을 설명하는 것은 허용한다. 실제 지원 전환은 project.json에서
+planned에서 active로 명시적으로 옮기고 해당 플랫폼의 실제 검증 기록을 남긴다.
 
 ## 이관과 호환
 
@@ -54,7 +57,9 @@ done plan/work/issue와 released release는 passed evidence 최소 1개가 필�
 
 ## 검증 범위
 
-validate는 metadata/ID/참조/기록된 근거/관리 hash와 등록 문서 상대 링크를 검사한다.
+validate는 metadata/ID/참조/기록된 근거/관리 hash와 payload 목록 일치, 등록 문서 상대 링크를 검사한다.
+inline 이미지와 명시적/축약형 이름 참조(`[text][ref]`, `[ref][]`)도 검사한다.
+완전한 CommonMark parser는 아니며 정의 없는 단축 참조(`[ref]`)는 진단하지 않는다.
 코드 block의 예시 링크, 외부 URL, anchor, 승인 진위, 실제 기능/보안은 판정하지 않는다.
 테스트 command를 실행하지 않는다. 빈 registry도 설치 검사는 통과하지만 제품 검증은 0건이다.
 

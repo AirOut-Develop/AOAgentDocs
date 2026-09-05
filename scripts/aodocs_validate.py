@@ -24,8 +24,13 @@ STATUS_BY_KIND = {
     "release": {"not_deployed", "canary", "released", "rolled_back"},
 }
 ID_ARRAY_FIELDS = ("refs", "evidence", "requirements", "covers")
-LINK_PATTERN = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]*)\)")
+LINK_PATTERN = re.compile(r"!?\[[^\]]*\]\(([^)]*)\)")
+REFERENCE_DEFINITION_PATTERN = re.compile(
+    r"^[ \t]{0,3}\[([^\]]+)\]:[ \t]*(<[^>]*>|\S+)(?:[ \t]+.*)?$", re.MULTILINE
+)
+REFERENCE_USE_PATTERN = re.compile(r"!?\[([^\]]+)\]\[([^\]]*)\]")
 FENCE_PATTERN = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})")
+INLINE_CODE_PATTERN = re.compile(r"(?<!`)(`+)(?!`).*?(?<!`)\1(?!`)", re.DOTALL)
 
 
 def _load_json(path: Path, label: str, errors: list[str]) -> Any:
@@ -99,11 +104,11 @@ def _validate_platform_array(
     return valid
 
 
-def _validate_project(data: Any, errors: list[str]) -> set[str]:
+def _validate_project(data: Any, errors: list[str]) -> tuple[set[str], set[str]]:
     label = ".aodocs/project.json"
     if not isinstance(data, dict):
         errors.append(f"{label}: top level must be an object")
-        return set()
+        return set(), set()
     if type(data.get("schema_version")) is not int or data.get("schema_version") != 1:
         errors.append(f"{label}: schema_version must be 1")
     if not _is_nonempty_string(data.get("project_id")):
@@ -117,7 +122,7 @@ def _validate_project(data: Any, errors: list[str]) -> set[str]:
         errors.append(
             f"{label}: platforms cannot be both active and planned: {', '.join(sorted(overlap))}"
         )
-    return set(platforms + planned)
+    return set(platforms + planned), set(planned) - set(platforms)
 
 
 def _validate_id_array(record: dict[str, Any], field: str, label: str, errors: list[str]) -> list[str]:
@@ -163,7 +168,11 @@ def _validate_document_path(
 
 
 def _validate_records(
-    data: Any, target: Path, project_platforms: set[str], errors: list[str]
+    data: Any,
+    target: Path,
+    project_platforms: set[str],
+    planned_only_platforms: set[str],
+    errors: list[str],
 ) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]], list[Path]]:
     manifest_label = ".aodocs/documents.json"
     if not isinstance(data, dict):
@@ -209,7 +218,7 @@ def _validate_records(
             errors.append(f"{label}.revision: must be a positive integer")
         if not _is_nonempty_string(item.get("owner")):
             errors.append(f"{label}.owner: must be a nonempty string")
-        _validate_platform_array(
+        record_platforms = _validate_platform_array(
             item.get("platforms"), f"{label}.platforms", errors, project_platforms
         )
         for field in ID_ARRAY_FIELDS:
@@ -237,6 +246,21 @@ def _validate_records(
             for field in ("reason", "owner", "expires_at"):
                 if not _is_nonempty_string(item.get(field)):
                     errors.append(f"{label}.{field}: waived verification requires a nonempty string")
+        terminal_on_planned = kind == "verification" and status == "passed"
+        terminal_on_planned = terminal_on_planned or (
+            kind in {"plan", "work", "issue"} and status == "done"
+            if isinstance(kind, str)
+            else False
+        )
+        terminal_on_planned = terminal_on_planned or (
+            kind == "release" and status == "released"
+        )
+        invalid_planned = sorted(set(record_platforms) & planned_only_platforms)
+        if terminal_on_planned and invalid_planned:
+            errors.append(
+                f"{label} ({doc_id}): terminal status is not allowed on planned-only platforms: "
+                f"{', '.join(invalid_planned)}"
+            )
     return records, by_id, paths
 
 
@@ -333,6 +357,8 @@ def _validate_manifest(target: Path, data: Any, errors: list[str]) -> None:
         errors.append(f"{label}: .aodocs/kit must not be a symlink")
     if "VERSION" not in files:
         errors.append(f"{label}: files must include VERSION")
+    if "kit-files.json" not in files:
+        errors.append(f"{label}: files must include managed kit-files.json")
     version_path = kit_root / "VERSION"
     version_is_symlink = kit_root_is_symlink or version_path.is_symlink()
     if version_is_symlink:
@@ -345,6 +371,7 @@ def _validate_manifest(target: Path, data: Any, errors: list[str]) -> None:
         except (OSError, UnicodeError) as exc:
             errors.append(f"{label}: cannot read .aodocs/kit/VERSION: {exc}")
 
+    trusted_index = False
     for relative, expected in files.items():
         if not _safe_relative(relative):
             errors.append(f"{label}: unsafe managed payload path {relative!r}")
@@ -363,6 +390,35 @@ def _validate_manifest(target: Path, data: Any, errors: list[str]) -> None:
             continue
         if actual != expected:
             errors.append(f"{label}: sha256 mismatch for managed payload {relative!r}")
+        elif relative == "kit-files.json":
+            trusted_index = True
+
+    if not trusted_index:
+        return
+    index_label = ".aodocs/kit/kit-files.json"
+    index = _load_json(kit_root / "kit-files.json", index_label, errors)
+    if not isinstance(index, dict):
+        if index is not None:
+            errors.append(f"{index_label}: top level must be an object")
+        return
+    if type(index.get("schema_version")) is not int or index.get("schema_version") != 1:
+        errors.append(f"{index_label}: schema_version must be 1")
+    listed = index.get("files")
+    if not isinstance(listed, list):
+        errors.append(f"{index_label}: files must be an array")
+        return
+    valid_paths: list[str] = []
+    seen: set[str] = set()
+    for relative in listed:
+        if not _safe_relative(relative):
+            errors.append(f"{index_label}: unsafe payload path {relative!r}")
+        elif relative in seen:
+            errors.append(f"{index_label}: duplicate payload path {relative!r}")
+        else:
+            seen.add(relative)
+            valid_paths.append(relative)
+    if set(valid_paths) != set(files) or len(valid_paths) != len(files):
+        errors.append(f"{label}: managed file keys must exactly match {index_label} files")
 
 
 def _link_destination(raw: str) -> str:
@@ -396,6 +452,35 @@ def _without_fenced_code(text: str) -> str:
     return "".join(kept)
 
 
+def _reference_label(value: str) -> str:
+    return " ".join(value.split()).casefold()
+
+
+def _validate_link_destination(
+    target: Path, document: Path, destination: str, errors: list[str]
+) -> None:
+    if not destination:
+        errors.append(f"{document.relative_to(target)}: empty relative link destination")
+        return
+    if destination.startswith("#") or "{" in destination or "}" in destination:
+        return
+    try:
+        parsed = urlsplit(destination)
+    except ValueError as exc:
+        errors.append(f"{document.relative_to(target)}: malformed link {destination!r}: {exc}")
+        return
+    if parsed.scheme or parsed.netloc:
+        return
+    relative = unquote(parsed.path)
+    if not relative:
+        return
+    linked = document.parent / relative
+    if not _contained(linked, target) or _has_symlink(linked, target) or not linked.exists():
+        errors.append(
+            f"{document.relative_to(target)}: missing or unsafe relative link {destination!r}"
+        )
+
+
 def _validate_links(target: Path, documents: list[Path], errors: list[str]) -> None:
     for document in documents:
         try:
@@ -403,31 +488,43 @@ def _validate_links(target: Path, documents: list[Path], errors: list[str]) -> N
         except (OSError, UnicodeError) as exc:
             errors.append(f"{document.relative_to(target)}: cannot inspect Markdown links: {exc}")
             continue
-        text = _without_fenced_code(text)
+        text = INLINE_CODE_PATTERN.sub("", _without_fenced_code(text))
+        definitions: set[str] = set()
+        for match in REFERENCE_DEFINITION_PATTERN.finditer(text):
+            definitions.add(_reference_label(match.group(1)))
+            _validate_link_destination(
+                target, document, _link_destination(match.group(2)), errors
+            )
+        for match in REFERENCE_USE_PATTERN.finditer(text):
+            raw_label = match.group(2) or match.group(1)
+            label = _reference_label(raw_label)
+            if label not in definitions:
+                errors.append(
+                    f"{document.relative_to(target)}: undefined Markdown reference {raw_label!r}"
+                )
         for match in LINK_PATTERN.finditer(text):
             destination = _link_destination(match.group(1))
-            if not destination:
-                errors.append(f"{document.relative_to(target)}: empty relative link destination")
-                continue
-            if destination.startswith("#") or "{" in destination or "}" in destination:
-                continue
-            try:
-                parsed = urlsplit(destination)
-            except ValueError as exc:
-                errors.append(
-                    f"{document.relative_to(target)}: malformed link {destination!r}: {exc}"
-                )
-                continue
-            if parsed.scheme or parsed.netloc:
-                continue
-            relative = unquote(parsed.path)
-            if not relative:
-                continue
-            linked = document.parent / relative
-            if not _contained(linked, target) or _has_symlink(linked, target) or not linked.exists():
-                errors.append(
-                    f"{document.relative_to(target)}: missing or unsafe relative link {destination!r}"
-                )
+            _validate_link_destination(target, document, destination, errors)
+
+
+def _metadata_preflight(target: Path, errors: list[str]) -> bool:
+    aodocs = target / ".aodocs"
+    if _has_symlink(aodocs, target):
+        errors.append(".aodocs: path components and metadata must not be symlinks")
+        return False
+    if aodocs.exists() and not aodocs.is_dir():
+        errors.append(".aodocs: must be a directory")
+        return False
+    safe = True
+    for name in ("project.json", "documents.json", "manifest.json"):
+        path = aodocs / name
+        if path.is_symlink():
+            errors.append(f".aodocs/{name}: metadata must not be a symlink")
+            safe = False
+        elif path.exists() and not path.is_file():
+            errors.append(f".aodocs/{name}: metadata must be a regular file")
+            safe = False
+    return safe
 
 
 def validate(target: Path) -> list[str]:
@@ -436,6 +533,8 @@ def validate(target: Path) -> list[str]:
     errors: list[str] = []
     try:
         root = Path(target)
+        if not _metadata_preflight(root, errors):
+            return errors
         project = _load_json(root / ".aodocs" / "project.json", ".aodocs/project.json", errors)
         documents = _load_json(
             root / ".aodocs" / "documents.json", ".aodocs/documents.json", errors
@@ -443,9 +542,11 @@ def validate(target: Path) -> list[str]:
         manifest = _load_json(
             root / ".aodocs" / "manifest.json", ".aodocs/manifest.json", errors
         )
-        platforms = _validate_project(project, errors) if project is not None else set()
+        platforms, planned_only = (
+            _validate_project(project, errors) if project is not None else (set(), set())
+        )
         records, by_id, document_paths = (
-            _validate_records(documents, root, platforms, errors)
+            _validate_records(documents, root, platforms, planned_only, errors)
             if documents is not None
             else ([], {}, [])
         )

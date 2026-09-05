@@ -19,10 +19,20 @@ class ValidateTests(unittest.TestCase):
         kit = aodocs / "kit"
         kit.mkdir(parents=True)
         (kit / "VERSION").write_text("1.3.0\n", encoding="utf-8")
-        digest = hashlib.sha256((kit / "VERSION").read_bytes()).hexdigest()
+        self.write_json(
+            ".aodocs/kit/kit-files.json",
+            {"schema_version": 1, "files": ["VERSION", "kit-files.json"]},
+        )
         self.write_json(
             ".aodocs/manifest.json",
-            {"schema_version": 1, "kit_version": "1.3.0", "files": {"VERSION": digest}},
+            {
+                "schema_version": 1,
+                "kit_version": "1.3.0",
+                "files": {
+                    name: hashlib.sha256((kit / name).read_bytes()).hexdigest()
+                    for name in ("VERSION", "kit-files.json")
+                },
+            },
         )
         self.write_json(
             ".aodocs/project.json",
@@ -66,6 +76,14 @@ class ValidateTests(unittest.TestCase):
         self.write_json(
             ".aodocs/documents.json", {"schema_version": 1, "documents": documents}
         )
+
+    def refresh_managed_hash(self, relative):
+        manifest_path = self.target / ".aodocs/manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["files"][relative] = hashlib.sha256(
+            (self.target / ".aodocs/kit" / relative).read_bytes()
+        ).hexdigest()
+        self.write_json(".aodocs/manifest.json", manifest)
 
     def assert_error_contains(self, fragment):
         errors = validate(self.target)
@@ -399,6 +417,153 @@ class ValidateTests(unittest.TestCase):
             },
         )
         self.assert_error_contains("both active and planned")
+
+    def test_planned_only_platform_cannot_have_completed_lifecycle_records(self):
+        self.write_json(
+            ".aodocs/project.json",
+            {
+                "schema_version": 1,
+                "project_id": "sample-project",
+                "platforms": ["server"],
+                "planned_platforms": ["android"],
+            },
+        )
+        records = []
+        for doc_id, kind, status in (
+            ("VER-1", "verification", "passed"),
+            ("WRK-1", "work", "done"),
+            ("PLAN-1", "plan", "done"),
+            ("ISS-1", "issue", "done"),
+            ("REL-1", "release", "released"),
+        ):
+            extra = {"platforms": ["android"]}
+            if kind == "verification":
+                extra.update(command="test", environment="ci", source_revision="abc")
+            else:
+                extra["evidence"] = ["VER-1"]
+            records.append(
+                self.record(doc_id, kind, f"docs/{doc_id}.md", status, **extra)
+            )
+        self.set_documents(records)
+        errors = validate(self.target)
+        for doc_id in ("VER-1", "WRK-1", "PLAN-1", "ISS-1", "REL-1"):
+            self.assertTrue(
+                any(doc_id in error and "planned-only" in error for error in errors),
+                (doc_id, errors),
+            )
+
+    def test_planned_only_platform_is_allowed_for_noncompleted_records(self):
+        project = json.loads((self.target / ".aodocs/project.json").read_text())
+        project["planned_platforms"] = ["android"]
+        self.write_json(".aodocs/project.json", project)
+        self.set_documents(
+            [self.record("PLAN-1", "plan", "docs/plan.md", "planned", platforms=["android"])]
+        )
+        self.assertEqual([], validate(self.target))
+
+    def test_approved_design_may_describe_a_planned_only_platform(self):
+        project = json.loads((self.target / ".aodocs/project.json").read_text())
+        project["planned_platforms"] = ["android"]
+        self.write_json(".aodocs/project.json", project)
+        self.set_documents(
+            [
+                self.record(
+                    "DESIGN-1",
+                    "design",
+                    "docs/design.md",
+                    "approved",
+                    platforms=["android"],
+                    approval={"by": "reviewer", "at": "2026-09-05", "revision": 1},
+                )
+            ]
+        )
+        self.assertEqual([], validate(self.target))
+
+    def test_aodocs_and_metadata_symlinks_are_rejected_before_reads(self):
+        with tempfile.TemporaryDirectory() as other_temp:
+            other = Path(other_temp)
+            aodocs = self.target / ".aodocs"
+            moved = other / "external-aodocs"
+            aodocs.rename(moved)
+            (moved / "project.json").write_bytes(b"\xff")
+            aodocs.symlink_to(moved, target_is_directory=True)
+            errors = validate(self.target)
+            self.assertTrue(any(".aodocs" in error and "symlink" in error for error in errors), errors)
+            self.assertFalse(any("invalid JSON" in error or "cannot be read" in error for error in errors), errors)
+
+    def test_metadata_file_symlink_is_rejected_before_read(self):
+        project = self.target / ".aodocs/project.json"
+        external = self.target / "external-project.json"
+        external.write_bytes(b"\xff")
+        project.unlink()
+        project.symlink_to(external)
+        errors = validate(self.target)
+        self.assertTrue(any("project.json" in error and "symlink" in error for error in errors), errors)
+        self.assertFalse(any("cannot be read" in error for error in errors), errors)
+
+    def test_manifest_keys_must_exactly_match_trusted_kit_file_index(self):
+        manifest_path = self.target / ".aodocs/manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        payload = self.target / ".aodocs/kit/EXTRA.md"
+        payload.write_text("extra", encoding="utf-8")
+        manifest["files"]["EXTRA.md"] = hashlib.sha256(payload.read_bytes()).hexdigest()
+        self.write_json(".aodocs/manifest.json", manifest)
+        self.assert_error_contains("exactly match")
+
+    def test_kit_index_is_parsed_only_after_its_hash_matches(self):
+        index = self.target / ".aodocs/kit/kit-files.json"
+        index.write_bytes(b"\xff")
+        errors = validate(self.target)
+        self.assertTrue(any("sha256 mismatch" in error and "kit-files.json" in error for error in errors), errors)
+        self.assertFalse(any("kit-files.json: invalid" in error for error in errors), errors)
+
+    def test_trusted_kit_index_rejects_unsafe_duplicate_and_absolute_paths(self):
+        for files in (
+            ["VERSION", "kit-files.json", "VERSION"],
+            ["VERSION", "kit-files.json", "../escape"],
+            ["VERSION", "kit-files.json", "/absolute"],
+        ):
+            with self.subTest(files=files):
+                self.write_json(
+                    ".aodocs/kit/kit-files.json", {"schema_version": 1, "files": files}
+                )
+                self.refresh_managed_hash("kit-files.json")
+                self.assert_error_contains("kit-files.json")
+
+    def test_manifest_requires_kit_file_index_to_be_managed(self):
+        manifest = json.loads((self.target / ".aodocs/manifest.json").read_text())
+        del manifest["files"]["kit-files.json"]
+        self.write_json(".aodocs/manifest.json", manifest)
+        self.assert_error_contains("kit-files.json")
+
+    def test_missing_markdown_reference_definition_target_is_reported(self):
+        record = self.record("PRD-1", "prd", "docs/prd.md", "draft")
+        self.write_doc("docs/prd.md", "See [the plan][plan].\n\n[plan]: missing.md\n")
+        self.set_documents([record])
+        self.assert_error_contains("missing.md")
+
+    def test_undefined_named_markdown_reference_is_reported(self):
+        record = self.record("PRD-1", "prd", "docs/prd.md", "draft")
+        self.write_doc("docs/prd.md", "See [the plan][undefined].\n")
+        self.set_documents([record])
+        self.assert_error_contains("undefined")
+
+    def test_inline_code_reference_examples_are_ignored_but_adjacent_real_reference_is_checked(self):
+        record = self.record("PRD-1", "prd", "docs/prd.md", "draft")
+        self.write_doc(
+            "docs/prd.md",
+            "`[text][fake-one]` and ``![image][fake-two]`` but [real][missing].\n",
+        )
+        self.set_documents([record])
+        errors = validate(self.target)
+        self.assertTrue(any("missing" in error for error in errors), errors)
+        self.assertFalse(any("fake-one" in error or "fake-two" in error for error in errors), errors)
+
+    def test_missing_inline_image_is_reported(self):
+        record = self.record("PRD-1", "prd", "docs/prd.md", "draft")
+        self.write_doc("docs/prd.md", "![diagram](missing.png)\n")
+        self.set_documents([record])
+        self.assert_error_contains("missing.png")
 
 
 if __name__ == "__main__":

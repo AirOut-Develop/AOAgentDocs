@@ -1,15 +1,13 @@
-# 🏗️ 안드로이드 아키텍처 가이드 (Android Architecture)
+# Android 네이티브 적용 규칙
 
-## 1. 기술 스택
-- **언어:** Kotlin (100%)
-- **UI:** XML Layout (View System)
-- **권장 패턴:** MVVM (Model-View-ViewModel)
+- 언어/UI 도구와 최소 SDK는 제품 설계에서 선택한다. 킷이 XML UI나 공통 UI 프레임워크를 강제하지 않는다.
+- 화면 상태, 도메인 동작, 서버 DTO/저장소/장치 접근의 경계를 구분한다.
+- 전역 Singleton을 기본 해법으로 삼지 않는다. 생명주기·취소·의존성 소유권을 명시한다.
+- 사용자 계정/대화 권한/모델 정책은 서버 공통 계약을 따른다.
+- 카메라·음성·보안 저장소·권한 UI는 Android 구현이 담당한다.
+- 앱 복귀/프로세스 재생성/네트워크 변경/권한 거절을 검증한다.
+- iOS와 데이터 fixture/수용 기준은 공유하되 시뮬레이터·에뮬레이터와 실기 검증을 구분한다.
+- 서명 키·세션·개인 데이터는 문서/킷에 기록하지 않는다.
 
-## 2. 레이어 구조 (Layer Structure)
-- **ui:** Activity, Fragment (UI 로직)
-- **viewmodel:** ViewModel (상태 관리, 비즈니스 로직 연결)
-- **data:** Repository, DataSource, Model (데이터 처리)
-
-## 3. 상태 관리
-- **전역 상태:** Singleton (object) 패턴 사용 권장.
-- **UI 상태:** LiveData 또는 StateFlow 사용.
+v1.2의 Kotlin/XML/MVVM 예시는 기존 프로젝트의 선택으로 보존할 수 있다.
+1.3 설치가 소비자의 기존 아키텍처를 자동 변경하지는 않는다.

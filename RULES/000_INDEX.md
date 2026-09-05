@@ -15,14 +15,14 @@
 - [CODE_ETHICS.md](./COMMON/CODE_ETHICS.md): 코드 명명, 주석, 검증 태도
 
 ## 📱 플랫폼별 지침 (PLATFORM)
-### Android (Base)
-- [ARCHITECTURE.md](./PLATFORM/ANDROID/ARCHITECTURE.md): 안드로이드 아키텍처, MVVM, 레이어 구조
+### Android
+- [ARCHITECTURE.md](./PLATFORM/ANDROID/ARCHITECTURE.md): 네이티브 책임·생명주기·검증 경계
 
-### Web (Placeholder)
-- [ARCHITECTURE.md](./PLATFORM/WEB/ARCHITECTURE.md): 웹 아키텍처 (예정)
+### Web
+- [ARCHITECTURE.md](./PLATFORM/WEB/ARCHITECTURE.md): 브라우저 책임·보안·검증 경계
 
-### Server (Placeholder)
-- [ARCHITECTURE.md](./PLATFORM/SERVER/ARCHITECTURE.md): 서버 아키텍처 (예정)
+### Server
+- [ARCHITECTURE.md](./PLATFORM/SERVER/ARCHITECTURE.md): API·계정·데이터·운영 경계
 
 ## 제품 생명주기
 - [DOCUMENT_LIFECYCLE.md](COMMON/DOCUMENT_LIFECYCLE.md) — PRD/계획/검증 연결

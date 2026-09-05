@@ -148,8 +148,12 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
 
     source_real = source.resolve(strict=True)
     target_real = target.resolve(strict=True)
+    if not target_real.name:
+        raise ValueError("target project directory must have a non-empty name")
     if source_real == target_real or source_real in target_real.parents or target_real in source_real.parents:
         raise ValueError("source and target must not overlap")
+    source = source_real
+    target = target_real
 
     selected_profiles = list(profiles) if profiles else ["server"]
     if any(not isinstance(profile, str) or profile not in _ALLOWED_PROFILES for profile in selected_profiles):
@@ -198,7 +202,7 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
 
     project = {
         "schema_version": _SCHEMA_VERSION,
-        "project_id": target.name,
+        "project_id": target_real.name,
         "platforms": selected_profiles,
         "planned_platforms": [],
     }

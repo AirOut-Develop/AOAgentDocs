@@ -19,7 +19,8 @@ def build_package(root: Path) -> Path:
     if not isinstance(manifest, dict):
         raise ValueError("invalid kit-files manifest")
     files = manifest.get("files")
-    if manifest.get("schema_version") != 1 or not isinstance(files, list) or not files:
+    if (type(manifest.get("schema_version")) is not int or manifest["schema_version"] != 1
+            or not isinstance(files, list) or not files):
         raise ValueError("invalid kit-files manifest")
     seen = set()
     payload = {}
@@ -47,7 +48,7 @@ def build_package(root: Path) -> Path:
     if not {"VERSION", "kit-files.json"}.issubset(payload):
         raise ValueError("VERSION and kit-files.json must be included")
     version = payload["VERSION"].decode("utf-8").strip()
-    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         raise ValueError("invalid SemVer VERSION")
     dist = root / "dist"
     output = dist / f"AOAgentDocs_v{version}.zip"
