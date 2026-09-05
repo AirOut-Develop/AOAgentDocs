@@ -133,6 +133,29 @@ class DistributionTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("Product tests were NOT executed", result.stdout)
 
+    def test_git_autocrlf_roundtrip_preserves_installed_hashes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "consumer"
+            target.mkdir()
+            subprocess.run(["git", "init", "-q", str(target)], check=True)
+            subprocess.run(["git", "config", "core.autocrlf", "true"], cwd=target, check=True)
+            cli = ROOT / "scripts/aodocs.py"
+            result = subprocess.run([sys.executable, str(cli), "install", str(target), "--apply"], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            subprocess.run(["git", "add", "."], cwd=target, check=True, capture_output=True)
+            check = subprocess.run(["git", "diff", "--cached", "--check"], cwd=target, capture_output=True, text=True)
+            self.assertEqual(check.returncode, 0, check.stdout)
+            manifest = json.loads((target / ".aodocs/manifest.json").read_text())
+            for path in manifest["files"]:
+                name = ".aodocs/kit/" + path
+                staged = subprocess.check_output(["git", "show", ":" + name], cwd=target)
+                self.assertEqual(staged, (target / name).read_bytes(), name)
+            subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"], cwd=target, check=True)
+            clone = Path(tmp) / "checkout"
+            subprocess.run(["git", "-c", "core.autocrlf=true", "clone", "-q", str(target), str(clone)], check=True)
+            result = subprocess.run([sys.executable, str(clone / ".aodocs/kit/scripts/aodocs.py"), "validate", str(clone)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

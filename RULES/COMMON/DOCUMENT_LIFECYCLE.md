@@ -64,3 +64,10 @@ inline 이미지와 명시적/축약형 이름 참조(`[text][ref]`, `[ref][]`)�
 테스트 command를 실행하지 않는다. 빈 registry도 설치 검사는 통과하지만 제품 검증은 0건이다.
 
 [양식/JSON 예시](../../examples/lifecycle/README.md)를 참고한다.
+
+## Git 바이트 보존 (1.3.1)
+
+설치기가 `.aodocs/.gitattributes`를 관리한다. `.gitattributes -text`로 속성 파일 자체를,
+`kit/** -text whitespace=cr-at-eol`로 관리 킷의 원본 바이트를 보존한다.
+1.3.1 이상에서는 이 파일이 없거나 바뀌어도 validate가 실패한다. 같은 버전 재설치 역시 충돌을 확인한다.
+root의 프로젝트 Git 속성이나 사용자 문서를 자동으로 변경하지 않는다.

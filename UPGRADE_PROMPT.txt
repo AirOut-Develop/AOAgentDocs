@@ -1,4 +1,4 @@
-[AOAgentDocs 1.3 비파괴 업그레이드]
+[AOAgentDocs 1.3.1 비파괴 업그레이드]
 
 1. 원본 킷 저장소의 remote/버전/변경 이력을 확인한다. 조직 포크에 git pull을 강제하지 않는다.
 2. 대상 .aodocs/manifest.json과 project.json을 확인한다. root .aodocs_version은 legacy 표시이므로 건드리지 않는다.
@@ -14,3 +14,6 @@ v1.2 root 복사 설치에서 올 때는 .aodocs/kit만 추가한다. legacy 파
 어느 규칙을 따를지 프로젝트 문서 지도에서 명시한다. manifest는 root 규칙이 갱신됐다는 주장이 아니다.
 킷 내부 파일을 소스로 사용해 같은 프로젝트에 재설치하지 않는다. 별도 다운로드/clone에서 실행한다.
 패키지 교체와 project metadata 변경은 분리한다. 토큰/로그/민감정보를 migration 산출물에 포함하지 않는다.
+
+1.3.0→1.3.1은 namespaced .gitattributes를 추가한다. 최종 validate 외에 Git에 등록한 바이트도 보존한다.
+이 속성 파일도 사용자 편집과 충돌하면 중단한다. root .gitattributes는 변경하지 않는다.

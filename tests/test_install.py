@@ -13,6 +13,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from aodocs_install import install
 
 
+GIT_ATTRIBUTES = b".gitattributes -text\nkit/** -text whitespace=cr-at-eol\n"
+
+
 class InstallTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -46,6 +49,7 @@ class InstallTests(unittest.TestCase):
         actions = install(self.source, self.target, ["server", "ios"], apply=False)
 
         self.assertTrue(actions)
+        self.assertIn("create .aodocs/.gitattributes", actions)
         self.assertFalse((self.target / ".aodocs").exists())
 
     def test_first_install_writes_namespaced_payload_and_metadata(self):
@@ -71,6 +75,45 @@ class InstallTests(unittest.TestCase):
             {"schema_version": 1, "documents": []},
             json.loads((self.target / ".aodocs/documents.json").read_text(encoding="utf-8")),
         )
+        self.assertEqual(GIT_ATTRIBUTES, (self.target / ".aodocs/.gitattributes").read_bytes())
+
+    def test_identical_existing_git_attributes_is_preserved(self):
+        attributes = self.target / ".aodocs/.gitattributes"
+        attributes.parent.mkdir()
+        attributes.write_bytes(GIT_ATTRIBUTES)
+
+        self.apply()
+
+        self.assertEqual(GIT_ATTRIBUTES, attributes.read_bytes())
+
+    def test_conflicting_git_attributes_refuses_before_payload_writes(self):
+        attributes = self.target / ".aodocs/.gitattributes"
+        attributes.parent.mkdir()
+        attributes.write_bytes(b"*.md text\n")
+
+        with self.assertRaises(ValueError):
+            self.apply()
+
+        self.assertFalse((self.target / ".aodocs/kit").exists())
+        self.assertEqual(b"*.md text\n", attributes.read_bytes())
+
+    def test_git_attributes_symlink_or_nonfile_is_rejected_before_writes(self):
+        base = Path(self.temp_dir.name)
+        outside = base / "outside-attributes"
+        outside.write_bytes(GIT_ATTRIBUTES)
+        symlink_target = base / "symlink-project"
+        symlink_target.mkdir()
+        (symlink_target / ".aodocs").mkdir()
+        (symlink_target / ".aodocs/.gitattributes").symlink_to(outside)
+        directory_target = base / "directory-project"
+        directory_target.mkdir()
+        (directory_target / ".aodocs/.gitattributes").mkdir(parents=True)
+
+        for target in (symlink_target, directory_target):
+            with self.subTest(target=target.name):
+                with self.assertRaises(ValueError):
+                    install(self.source, target, [], apply=True)
+                self.assertFalse((target / ".aodocs/kit").exists())
 
     def test_empty_profiles_default_to_server(self):
         self.apply([])

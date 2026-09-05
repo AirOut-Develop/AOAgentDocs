@@ -12,6 +12,8 @@ from aodocs_validate import validate
 
 
 class ValidateTests(unittest.TestCase):
+    GIT_ATTRIBUTES = b".gitattributes -text\nkit/** -text whitespace=cr-at-eol\n"
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.target = Path(self.temp.name)
@@ -82,6 +84,15 @@ class ValidateTests(unittest.TestCase):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["files"][relative] = hashlib.sha256(
             (self.target / ".aodocs/kit" / relative).read_bytes()
+        ).hexdigest()
+        self.write_json(".aodocs/manifest.json", manifest)
+
+    def set_kit_version(self, version):
+        (self.target / ".aodocs/kit/VERSION").write_text(version + "\n", encoding="utf-8")
+        manifest = json.loads((self.target / ".aodocs/manifest.json").read_text())
+        manifest["kit_version"] = version
+        manifest["files"]["VERSION"] = hashlib.sha256(
+            (self.target / ".aodocs/kit/VERSION").read_bytes()
         ).hexdigest()
         self.write_json(".aodocs/manifest.json", manifest)
 
@@ -369,6 +380,36 @@ class ValidateTests(unittest.TestCase):
         errors = validate(self.target)
         self.assertTrue(any("VERSION" in error and "symlink" in error for error in errors), errors)
         self.assertFalse(any("cannot read .aodocs/kit/VERSION" in error for error in errors), errors)
+
+    def test_kit_1_3_1_requires_exact_git_attributes(self):
+        self.set_kit_version("1.3.1")
+        self.assert_error_contains(".gitattributes")
+
+        (self.target / ".aodocs/.gitattributes").write_bytes(self.GIT_ATTRIBUTES)
+        self.assertEqual([], validate(self.target))
+
+        (self.target / ".aodocs/.gitattributes").write_bytes(b"kit/** -text\n")
+        self.assert_error_contains(".gitattributes")
+
+    def test_kit_1_3_0_allows_missing_attributes_but_validates_it_when_present(self):
+        self.assertEqual([], validate(self.target))
+        (self.target / ".aodocs/.gitattributes").write_bytes(b"wrong\n")
+        self.assert_error_contains(".gitattributes")
+        (self.target / ".aodocs/.gitattributes").write_bytes(self.GIT_ATTRIBUTES)
+        self.assertEqual([], validate(self.target))
+
+    def test_git_attributes_symlink_is_rejected_before_external_read(self):
+        external = self.target / "external-attributes"
+        external.write_bytes(self.GIT_ATTRIBUTES)
+        (self.target / ".aodocs/.gitattributes").symlink_to(external)
+        errors = validate(self.target)
+        self.assertTrue(any(".gitattributes" in error and "symlink" in error for error in errors), errors)
+
+    def test_kit_version_must_be_exactly_three_numeric_components(self):
+        for version in ("v1.3.1", "1.3.1-beta", "1.3", "1.3.1.0"):
+            with self.subTest(version=version):
+                self.set_kit_version(version)
+                self.assert_error_contains("numeric X.Y.Z")
 
     def test_missing_relative_markdown_link_is_reported(self):
         record = self.record(

@@ -2,6 +2,15 @@
 
 이 문서는 AOAgentDocs의 릴리즈 이력을 관리합니다.
 
+## [1.3.1] - 2026-09-05
+### Fixed
+- 첫 소비자에서 확인된 Git CRLF 정규화에 의한 관리 파일 hash 불일치
+- `.aodocs/.gitattributes`로 킷과 속성 파일 자체의 줄바꿈 변환 방지
+- 신규 속성 파일의 dry-run/충돌/symlink 보호와 1.3.1 무결성 검사
+- `core.autocrlf=true` 환경의 실제 git add/commit/clone/validate 회귀
+### Compatibility
+- 1.3.0 태그·산출물은 그대로 보존. 최신 install로 namespaced kit만 갱신.
+
 ## [1.3.0] - 2026-09-05
 ### Added
 - PRD/설계/ADR/계획/검증/릴리스 연결 규약과 선택적 registry

@@ -1,4 +1,4 @@
-[AOAgentDocs 1.3 신규/선택 이관]
+[AOAgentDocs 1.3.1 신규/선택 이관]
 
 대상 프로젝트와 원본 킷의 Git root/remote/dirty 상태를 먼저 확인한다.
 기존 프로젝트 지침을 읽고 원본 킷은 대상 디렉터리 바깥에서 실행한다.
@@ -19,3 +19,6 @@ Python 3.10+ 표준 라이브러리를 사용한다.
 root의 옛 .aodocs_version은 legacy root 복사본의 버전이다. 새 설치 버전은 .aodocs/manifest.json이 정본.
 설치기는 source/target 중첩, symlink, 경로 탈출, 기존 관리 파일 수정 충돌을 거부한다.
 원자적 동시 설치는 지원하지 않는다. 중단되면 diff 확인 후 복구하고 동시 실행하지 않는다.
+
+1.3.1은 .aodocs/.gitattributes도 설치한다. 속성 파일과 kit 바이트의 Git 자동 줄바꿈 변환을 방지한다.
+기존 속성 파일 내용이 다르면 덮어쓰지 않고 중단한다. 프로젝트 root .gitattributes는 변경하지 않는다.

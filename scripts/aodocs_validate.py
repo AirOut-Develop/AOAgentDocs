@@ -13,6 +13,8 @@ from urllib.parse import unquote, urlsplit
 ALLOWED_PLATFORMS = {"server", "ios", "android", "web"}
 ID_PATTERN = re.compile(r"^[A-Z0-9]+(?:-[A-Z0-9]+)*$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+VERSION_PATTERN = re.compile(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$")
+GIT_ATTRIBUTES_CONTENT = b".gitattributes -text\nkit/** -text whitespace=cr-at-eol\n"
 STATUS_BY_KIND = {
     "prd": {"draft", "in_review", "approved", "superseded", "withdrawn"},
     "design": {"draft", "in_review", "approved", "superseded", "withdrawn"},
@@ -345,8 +347,16 @@ def _validate_manifest(target: Path, data: Any, errors: list[str]) -> None:
     if type(data.get("schema_version")) is not int or data.get("schema_version") != 1:
         errors.append(f"{label}: schema_version must be 1")
     kit_version = data.get("kit_version")
+    version_tuple: tuple[int, int, int] | None = None
     if not _is_nonempty_string(kit_version):
         errors.append(f"{label}: kit_version must be a nonempty string")
+    else:
+        version_match = VERSION_PATTERN.fullmatch(kit_version)
+        if version_match is None:
+            errors.append(f"{label}: kit_version must use numeric X.Y.Z format")
+        else:
+            version_tuple = tuple(int(part) for part in version_match.groups())
+    _validate_git_attributes(target, version_tuple, errors)
     files = data.get("files")
     if not isinstance(files, dict):
         errors.append(f"{label}: files must be a path-to-sha256 object")
@@ -419,6 +429,27 @@ def _validate_manifest(target: Path, data: Any, errors: list[str]) -> None:
             valid_paths.append(relative)
     if set(valid_paths) != set(files) or len(valid_paths) != len(files):
         errors.append(f"{label}: managed file keys must exactly match {index_label} files")
+
+
+def _validate_git_attributes(
+    target: Path, version: tuple[int, int, int] | None, errors: list[str]
+) -> None:
+    path = target / ".aodocs" / ".gitattributes"
+    if not path.exists():
+        if version is not None and version >= (1, 3, 1):
+            errors.append(
+                ".aodocs/.gitattributes: required for kit_version 1.3.1 and newer"
+            )
+        return
+    try:
+        contents = path.read_bytes()
+    except OSError as exc:
+        errors.append(f".aodocs/.gitattributes: cannot be read: {exc}")
+        return
+    if contents != GIT_ATTRIBUTES_CONTENT:
+        errors.append(
+            ".aodocs/.gitattributes: content must exactly preserve managed kit files"
+        )
 
 
 def _link_destination(raw: str) -> str:
@@ -516,10 +547,10 @@ def _metadata_preflight(target: Path, errors: list[str]) -> bool:
         errors.append(".aodocs: must be a directory")
         return False
     safe = True
-    for name in ("project.json", "documents.json", "manifest.json"):
+    for name in ("project.json", "documents.json", "manifest.json", ".gitattributes"):
         path = aodocs / name
         if path.is_symlink():
-            errors.append(f".aodocs/{name}: metadata must not be a symlink")
+            errors.append(f".aodocs/{name}: file must not be a symlink")
             safe = False
         elif path.exists() and not path.is_file():
             errors.append(f".aodocs/{name}: metadata must be a regular file")

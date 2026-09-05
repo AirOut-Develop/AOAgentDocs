@@ -13,6 +13,7 @@ from typing import Any
 _ALLOWED_PROFILES = {"server", "ios", "android", "web"}
 _SCHEMA_VERSION = 1
 _VERSION_PATTERN = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+_GIT_ATTRIBUTES = b".gitattributes -text\nkit/** -text whitespace=cr-at-eol\n"
 
 
 def _sha256(contents: bytes) -> str:
@@ -166,9 +167,22 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
     manifest_path = aodocs / "manifest.json"
     project_path = aodocs / "project.json"
     documents_path = aodocs / "documents.json"
+    attributes_path = aodocs / ".gitattributes"
 
-    for relative in (".aodocs", ".aodocs/kit", ".aodocs/manifest.json", ".aodocs/project.json", ".aodocs/documents.json"):
+    for relative in (
+        ".aodocs",
+        ".aodocs/kit",
+        ".aodocs/.gitattributes",
+        ".aodocs/manifest.json",
+        ".aodocs/project.json",
+        ".aodocs/documents.json",
+    ):
         _assert_no_symlink_components(target, relative)
+    if attributes_path.exists():
+        if not attributes_path.is_file():
+            raise ValueError(f"installer attribute path is not a file: {attributes_path}")
+        if attributes_path.read_bytes() != _GIT_ATTRIBUTES:
+            raise ValueError("existing .aodocs/.gitattributes conflicts with installer policy")
     old_manifest = _load_existing_manifest(manifest_path)
     old_files, installed_version = old_manifest if old_manifest is not None else ({}, None)
     if installed_version is not None and _parse_version(version, "VERSION") < installed_version:
@@ -180,6 +194,8 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
 
     desired_hashes = {relative: _sha256(source_contents[relative]) for relative in files}
     actions: list[str] = []
+    if not attributes_path.exists():
+        actions.append("create .aodocs/.gitattributes")
     for relative in files:
         managed_relative = f".aodocs/kit/{relative}"
         _assert_no_symlink_components(target, managed_relative)
@@ -225,7 +241,10 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
     if not apply:
         return actions
 
-    kit.mkdir(parents=True, exist_ok=True)
+    aodocs.mkdir(parents=True, exist_ok=True)
+    if not attributes_path.exists():
+        attributes_path.write_bytes(_GIT_ATTRIBUTES)
+    kit.mkdir(exist_ok=True)
     for relative in files:
         destination = kit.joinpath(*PurePosixPath(relative).parts)
         desired = source_contents[relative]
