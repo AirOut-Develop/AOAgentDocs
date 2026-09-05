@@ -23,6 +23,10 @@ docs/ONBOARDING.md
 # Agent/tool runtime artifacts
 .omc/
 .codex/
+.omx/
+.superpowers/
+__pycache__/
+*.pyc
 
 # Prevent accidental project-specific log migration into the kit
 /docs/communication/

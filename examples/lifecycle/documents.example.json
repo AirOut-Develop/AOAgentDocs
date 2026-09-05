@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "documents": [
+    {
+      "id": "PRD-EXAMPLE",
+      "kind": "prd",
+      "path": "docs/prd/example.md",
+      "status": "draft",
+      "revision": 1,
+      "owner": "project-owner",
+      "platforms": [
+        "server"
+      ],
+      "requirements": [
+        "REQ-EXAMPLE-01"
+      ]
+    },
+    {
+      "id": "PLAN-EXAMPLE",
+      "kind": "plan",
+      "path": "docs/plans/example.md",
+      "status": "planned",
+      "revision": 1,
+      "owner": "project-owner",
+      "platforms": [
+        "server"
+      ],
+      "refs": [
+        "PRD-EXAMPLE"
+      ],
+      "covers": [
+        "REQ-EXAMPLE-01"
+      ]
+    },
+    {
+      "id": "VERIFY-EXAMPLE",
+      "kind": "verification",
+      "path": "docs/verification/example.md",
+      "status": "not_run",
+      "revision": 1,
+      "owner": "project-owner",
+      "platforms": [
+        "server"
+      ],
+      "refs": [
+        "PLAN-EXAMPLE"
+      ],
+      "covers": [
+        "REQ-EXAMPLE-01"
+      ]
+    }
+  ]
+}

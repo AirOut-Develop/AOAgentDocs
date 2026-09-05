@@ -1,47 +1,39 @@
-# 📘 프로젝트 기여 지침 (Project Contribution Guidelines)
+# 기여 및 프로젝트 도입 지침
 
-> 이 저장소는 안티그래비티 표준 문서 킷(AOAgentDocs)입니다.
-> 클린 아키텍처 관점에서 설계 의도와 의사결정 타당성을 기록합니다.
-> 기술 스택 비종속의 순수 로직 검증 문서를 유지합니다.
-> 시행착오는 `communication` 리포트로 축적해 장기 백업 지식으로 관리합니다.
+## 도입 사용자
 
-## 🛑 [필수] 작업 시작 전 파이프라인 (MIGRATION 완료 후)
-> 이 파이프라인은 `MIGRATION_PROMPT.txt`로 문서 킷 이식/초기화가 끝난 프로젝트에서 실행합니다.
+1. [README](README.md)의 dry-run/apply 순서로 설치한다.
+2. [생명주기 규칙](RULES/COMMON/DOCUMENT_LIFECYCLE.md)과 프로젝트 자체 지침을 함께 읽는다.
+3. `.aodocs/project.json`에 활성/계획 플랫폼을 구분한다.
+4. 작업 기록은 제품 저장소의 기존 docs에 남기고 registry에 연결한다.
+5. 일회성 온보딩 체크는 작업 문서에 기록한다. AGENTS/CLAUDE를 상태 파일로 바꾸지 않는다.
 
-1. [000_CHECKLIST_TEMPLATE.md](RULES/000_CHECKLIST_TEMPLATE.md)를 읽고 현재 세션용 체크리스트를 준비합니다.
-2. 프로젝트 루트에 `ONBOARDING.md`가 없으면 생성합니다. (또는 팀 표준 메모리 파일 사용)
-3. 체크리스트를 복사해 세션 정보와 함께 `ONBOARDING.md`(또는 팀 표준 파일)에 기록합니다.
-4. 체크박스를 완료한 뒤 작업을 시작합니다.
+## 공통 규칙
 
-## 🌐 공통 규칙
-- [COMMUNICATION.md](RULES/COMMON/COMMUNICATION.md)
-- [VERSION_CONTROL_CONVENTION.md](RULES/COMMON/VERSION_CONTROL_CONVENTION.md)
-- [CODE_ETHICS.md](RULES/COMMON/CODE_ETHICS.md)
+- [COMMUNICATION](RULES/COMMON/COMMUNICATION.md)
+- [DOCUMENT_LIFECYCLE](RULES/COMMON/DOCUMENT_LIFECYCLE.md)
+- [VERSION_CONTROL_CONVENTION](RULES/COMMON/VERSION_CONTROL_CONVENTION.md)
+- [CODE_ETHICS](RULES/COMMON/CODE_ETHICS.md)
 
-## 📱 플랫폼 규칙
+## 플랫폼 — 복수 선택 가능
+
 <!-- [PLATFORM_RULES_START] -->
-### Android
-- [ARCHITECTURE.md](RULES/PLATFORM/ANDROID/ARCHITECTURE.md)
+- [iOS](RULES/PLATFORM/IOS/ARCHITECTURE.md)
+- [Android](RULES/PLATFORM/ANDROID/ARCHITECTURE.md)
+- [Web](RULES/PLATFORM/WEB/ARCHITECTURE.md)
+- [Server](RULES/PLATFORM/SERVER/ARCHITECTURE.md)
 <!-- [PLATFORM_RULES_END] -->
 
-## 🚀 시작하기
-신규 프로젝트에 `AOAgentDocs`를 적용하려면 `MIGRATION_PROMPT.txt`를 먼저 읽고 진입합니다.
-기존 프로젝트를 업그레이드하려면 `UPGRADE_PROMPT.txt`를 사용합니다.
+공통 킷보다 프로젝트의 검증된 범위/기술 결정과 상위 지침이 우선한다.
+미구현 플랫폼을 현재 지원한다고 기록하지 않는다.
 
-- 최초 설치: `MIGRATION_PROMPT.txt`
-- 업그레이드: `UPGRADE_PROMPT.txt`
-- 소통 템플릿: `examples/communication/`
-- 환경 템플릿: `examples/PROJECT_ENV_Template.md`
+## 킷 기여자
 
-## 📦 릴리즈 관리
-- 버전 기준: `VERSION`
-- 변경 이력: `CHANGELOG.md`
-- 릴리즈 절차: `RELEASE_POLICY.md`
-- 중장기 계획: `ROADMAP.md`
-- 패키지 생성: `scripts/release_package.sh` (Linux/WSL), `scripts/release_package.ps1` (Windows)
-- 릴리즈 게이트: 보안 감사 완료 후에만 태그/배포 진행
+- 기존 기록을 이동하거나 무조건 덮어쓰는 업그레이드는 금지한다.
+- 도구 변경은 임시 프로젝트에서 실패 테스트 → 구현 → 회귀 검증한다.
+- VERSION/README/CHANGELOG/ROADMAP/설치 안내를 함께 점검한다.
+- payload 추가는 kit-files.json에 명시하고 개인정보/시크릿/로컬 산출물 혼입을 검토한다.
+- 소비자 프로젝트에 설치한 상태에서도 수정 충돌·멱등성·기존 문서 보존을 확인한다.
+- 운영 규약이나 승인 기록을 에이전트가 만들어 권한을 주장하지 않는다.
 
-## 🔐 이슈/PR 보안 게이트
-- 이슈 등록 전: 본문/첨부 로그에 토큰, 비밀번호, API Key, 개인식별정보가 없는지 점검합니다.
-- PR 생성 전: 변경 파일과 커밋 메시지에 민감정보가 없는지 점검합니다.
-- 보안 점검 미완료 상태에서는 이슈 등록/PR 제출을 금지합니다.
+[릴리스 정책](RELEASE_POLICY.md), [감사 안내](AGENT_AUDIT_PROMPT.md)를 따른다.

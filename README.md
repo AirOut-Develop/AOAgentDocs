@@ -1,189 +1,96 @@
-# 🌌 AOAgentDocs
+# AOAgentDocs
 
-> **Antigravity Standard Documentation System**
-> 에이전트 기반 개발 과정에서 설계 의도와 의사결정의 타당성을 장기적으로 보존하기 위한 표준 문서 킷
+**1.3.0 · PRD부터 개발·검증·배포까지 연결하는 재사용 문서 킷**
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](./VERSION)
+WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실제 검증 근거를 연결합니다.
+서버/iOS/Android/Web을 함께 선택할 수 있습니다. UI 프레임워크나 에이전트 실행 도구를 강제하지 않습니다.
 
----
+## 빠른 시작 — 기존 프로젝트를 덮어쓰지 않습니다
 
-## 🎯 설계 목적
+Python **3.10 이상**이 필요하며 추가 패키지는 없습니다. 먼저 신뢰할 수 있는 소스를 확인하세요.
 
-| 원칙 | 설명 |
-|------|------|
-| **클린 아키텍처 기록** | 개발 중 확정된 설계/아키텍처를 순수 로직 관점으로 문서화 |
-| **기술 스택 비종속** | 프레임워크 중심이 아닌 구조적 합리성에 집중 |
-| **장기 백업 지식** | 시행착오·실패 원인·우회 전략을 `communication` 체계로 축적 |
-
----
-
-## 🚀 빠른 시작
-
-### 🆕 최초 설치 (신규 프로젝트)
-
-<details>
-<summary>🤖 <b>에이전트에게 설치 요청하기 (Click to expand)</b></summary>
-
-```text
-[AOAgentDocs 신규 설치 요청]
-
-이 프로젝트에 안티그래비티 표준 문서 시스템(AOAgentDocs v1.2.0)을 구축해주세요.
-
-1. 설치
-   git clone https://github.com/AirOut-Develop/AOAgentDocs.git
-   AOAgentDocs의 CONTRIBUTING.md, RULES/, examples/ 를 프로젝트 루트로 복사
-
-2. 초기화
-   AOAgentDocs/MIGRATION_PROMPT.txt 를 읽고 초기 설정을 수행하세요.
-   - docs/communication/ 구조 생성 (works/, issues/, END/, 001_INDEX.md)
-   - .aodocs_version 마커 파일 생성 (내용: 1.2.0)
-
-3. 완료 보고
-   - 구축된 docs 폴더 구조를 트리 형태로 보여주세요.
-```
-</details>
-
-1. 위 프롬프트를 복사하여 에이전트에게 전달
-2. 또는 수동 설치:
-   ```bash
-   git clone https://github.com/AirOut-Develop/AOAgentDocs.git
-   cp -r AOAgentDocs/{CONTRIBUTING.md,RULES,examples} <YOUR_PROJECT>/
-   ```
-3. `MIGRATION_PROMPT.txt`에 따라 이식 절차 수행
-
-### 🔄 업그레이드 (기존 프로젝트)
-
-<details>
-<summary>🤖 <b>에이전트에게 업그레이드 요청하기 (Click to expand)</b></summary>
-
-```text
-[AOAgentDocs 업그레이드 요청]
-
-현재 프로젝트의 문서 시스템을 최신 AOAgentDocs v1.2.0 체계로 업그레이드해주세요.
-가장 중요한 변경점은 'WRK(작업 보고서) 체계 도입'과 '해시 기반 문서 ID' 입니다.
-
-1. AOAgentDocs 저장소 최신화
-   git clone https://github.com/AirOut-Develop/AOAgentDocs.git (이미 있으면 git pull)
-
-2. 업그레이드 실행
-   AOAgentDocs/UPGRADE_PROMPT.txt 내용을 읽고 지침에 따라 다음을 수행하세요:
-   - .aodocs_version 버전 비교 (v1.1.1 -> v1.2.0)
-   - 규칙 파일(RULES/COMMON/COMMUNICATION.md 등) 및 템플릿 갱신
-   - 기존 ISS-NNN 이슈들을 새로운 해시 체계(ISS_YYMMDD_NNN_hash_Flag_Name)로 리팩토링
-   - works/ 폴더 생성 및 END/ 아카이브 처리
-
-3. 완료 후 보고
-   - 변경된 폴더 구조와 리팩토링된 이슈 목록을 보고해주세요.
-```
-</details>
-
-1. 위 프롬프트를 복사하여 에이전트에게 전달
-2. 에이전트가 자동으로 **버전 비교 → 리팩토링 → 마커 갱신** 수행
-
----
-
-## 📁 문서 구성
-
-```text
-AOAgentDocs/
-├── CONTRIBUTING.md          ← 진입점: 작업 시작 파이프라인
-├── MIGRATION_PROMPT.txt     ← 최초 설치 프롬프트
-├── UPGRADE_PROMPT.txt       ← 업그레이드 자동 리팩토링 프롬프트
-├── RULES/
-│   ├── 000_INDEX.md         ← 규칙 인덱스 (우선순위: Platform > Common)
-│   ├── 000_CHECKLIST_TEMPLATE.md
-│   ├── COMMON/              ← 공통 규칙
-│   │   ├── COMMUNICATION.md
-│   │   ├── CODE_ETHICS.md
-│   │   └── VERSION_CONTROL_CONVENTION.md
-│   └── PLATFORM/            ← 플랫폼별 규칙
-│       ├── ANDROID/ARCHITECTURE.md
-│       ├── WEB/ARCHITECTURE.md
-│       └── SERVER/ARCHITECTURE.md
-├── examples/
-│   ├── PROJECT_ENV_Template.md
-│   └── communication/       ← WRK/ISS 운영 템플릿
-├── VERSION                   ← 현재 배포 버전
-├── CHANGELOG.md              ← 버전별 변경 이력
-├── RELEASE_POLICY.md         ← 릴리즈 운영 기준
-└── ROADMAP.md                ← 로드맵
-```
-
----
-
-## 📢 Communication 체계
-
-에이전트의 작업 과정과 문제 해결을 체계적으로 기록하는 이원 체계입니다.
-
-### WRK (작업 보고서) + ISS (이슈)
-
-```text
-docs/communication/
-├── works/     ← 진행중 작업만
-├── issues/    ← 진행중 이슈만
-├── END/       ← 완료 즉시 이동 (아카이브)
-└── 001_INDEX.md  ← WRK+ISS 통합 인덱스
-```
-
-### 네이밍 규칙
-
-```
-WRK_YYMMDD_NNN_hash_Name               ← 작업 보고서
-ISS_YYMMDD_NNN_hash_Flag_Name          ← 이슈
-     ──────  ───  ──────  ───  ────
-     날짜    순서  고유ID  플래그  이름
-```
-
-| 세그먼트 | 설명 |
-|---------|------|
-| `YYMMDD` | 생성 날짜 (1차 정렬) |
-| `NNN` | 해당 날짜 내 순서 (2차 정렬, WRK/ISS 독립 카운트) |
-| `hash` | 6자리 hex 고유 ID — SHA-256 앞 6자리, 생성 시 1회 확정 |
-| `Flag` | `L`(WRK 연계) / `S`(독립) — ISS에만 적용 |
-
-### 작업 흐름
-
-```mermaid
-graph LR
-    A[WRK 시작] --> B[진행 기록 누적]
-    B --> C{문제 발생?}
-    C -- Yes --> D[ISS 생성 Flag=L]
-    D --> E[ISS 해결]
-    E --> F[WRK 복귀]
-    F --> B
-    C -- No --> G[999_Completed.md]
-    G --> H[END/ 이동]
-```
-
-### 핵심 규칙
-- **해시는 Primary Key** — 인덱스 조회 없이 즉시 채번 가능 (충돌 불가)
-- **ISS(`L`)에는 부모 WRK 해시 필수** — 양방향 추적
-- **완료 즉시 `END/`로 이동** — `works/`와 `issues/`에는 진행중만
-- **중간 발견은 즉시 기록** — 종료까지 기다리지 않음
-- **보안 필수** — 토큰·비밀번호·키 마스킹 처리
-
----
-
-## 📦 릴리즈
-
-| 항목 | 링크 |
-|------|------|
-| 버전 정책 | [RELEASE_POLICY.md](./RELEASE_POLICY.md) |
-| 변경 이력 | [CHANGELOG.md](./CHANGELOG.md) |
-| 로드맵 | [ROADMAP.md](./ROADMAP.md) |
-| 현재 버전 | [VERSION](./VERSION) |
-
-**패키징:**
 ```bash
-# Linux / WSL
-./scripts/release_package.sh
-
-# Windows (PowerShell)
-./scripts/release_package.ps1
+git clone https://github.com/AirOut-Develop/AOAgentDocs.git
+cd AOAgentDocs
+# 정확한 버전은 태그 aodocs/v1.3.0 또는 검토한 커밋으로 고정하세요.
+python3 scripts/aodocs.py install /path/to/project --profile server --profile ios
+# 위 명령은 dry-run: 변경 목록만 확인합니다.
+python3 scripts/aodocs.py install /path/to/project --profile server --profile ios --apply
+python3 scripts/aodocs.py validate /path/to/project
 ```
 
-**배포 전 체크:**
-- `RELEASE_POLICY.md`의 보안 감사 게이트 충족 확인
-- 이슈/PR/릴리즈 보안 점검 완료
-- 배포 태그: `aodocs/vX.Y.Z`
+Windows에서는 `python3` 대신 `py -3`를 사용할 수 있습니다.
+ZIP을 받은 경우 `AOAgentDocs/`를 프로젝트 **바깥**에 풀고 같은 명령을 실행합니다.
+원본 킷과 대상 프로젝트 경로가 겹치면 설치를 거부합니다.
 
+### 설치 결과와 소유권
+
+```text
+<project>/
+  .aodocs/
+    kit/                  # 배포 규칙·템플릿·도구 (관리 파일; 직접 편집 금지)
+    manifest.json         # 설치 버전·파일 hash (설치기 소유)
+    project.json          # 현재/계획 플랫폼 (프로젝트 소유)
+    documents.json        # 문서 ID·상태·연결 (프로젝트 소유)
+  docs/                   # 실제 PRD·계획·이력은 기존 위치 그대로
+```
+
+기존 `README.md`, `AGENTS.md`, `CLAUDE.md`, `RULES/`, `.aodocs_version`, 이력은 보존합니다.
+자동으로 프로젝트의 규칙 우선순위를 바꾸지 않습니다. 프로젝트 문서 지도에
+`.aodocs/kit/RULES/COMMON/DOCUMENT_LIFECYCLE.md`와 `.aodocs/documents.json` 링크를 추가하세요.
+`.aodocs/`는 공유할 문서/도구이므로 Git에 추적합니다. 민감정보를 넣지 마세요.
+
+## 설치 후 첫 PRD 등록
+
+1. [생명주기 규칙](RULES/COMMON/DOCUMENT_LIFECYCLE.md)을 읽습니다.
+2. [양식 안내](examples/lifecycle/README.md)의 PRD/계획/검증 양식을 필요한 것만 복사합니다.
+3. `.aodocs/documents.json`에 문서 경로, 요구사항 ID, 참조를 등록합니다.
+4. `python3 .aodocs/kit/scripts/aodocs.py validate .`로 확인합니다.
+5. 실제 구현/테스트 뒤에만 검증 결과를 갱신합니다.
+
+**문서 검사 성공은 로그인이나 앱 기능 성공이 아닙니다.** 빈 registry도 설치 검사는 통과합니다.
+오탈자·작은 수정마다 PRD를 만들 필요는 없습니다.
+
+## 에이전트에게 요청하기
+
+```text
+AOAgentDocs 1.3을 이 프로젝트에 비파괴 설치해주세요.
+원본 킷은 프로젝트 외부에 두고 install dry-run부터 실행하세요.
+기존 지침/이력은 덮어쓰지 말고 활성 플랫폼과 계획 플랫폼을 분리하세요.
+제품 PRD 한 건을 실제 계획·이슈·검증 기록과 연결하고 validate를 실행하세요.
+검증된 내용과 미검증 기능을 구분해 보고하세요.
+```
+
+## 안전한 업그레이드
+
+같은 install 명령으로 최신 킷을 적용합니다. 같은 버전이어도 파일 hash를 확인합니다.
+관리 파일이 수정됐거나 새 payload에서 사라지면 변경 전에 중단합니다. 강제 덮어쓰기는 없습니다.
+사용자 소유 project/documents metadata는 자동으로 바꾸지 않습니다.
+과거 root 복사 설치(1.2)는 그대로 두고 `.aodocs/kit`을 추가하며, 실제 참조 이관은 사람이 검토합니다.
+자세한 절차: [신규 설치](MIGRATION_PROMPT.txt), [업그레이드](UPGRADE_PROMPT.txt).
+
+## 무엇이 연결되나요?
+
+`PRD 요구사항 → 설계/ADR → PLAN·WRK·ISS → 소스 커밋 → 검증 증거 → 릴리스`
+
+- 승인 문서: 누가 어느 revision을 검토했는지.
+- 완료 작업: 어떤 요구사항을 어떤 passed 검증으로 확인했는지.
+- 배포: iOS/Android/서버 각각 실제 배포 여부.
+- 과거 WRK/ISS ID와 END 이력은 자동 이동/재명명하지 않습니다.
+- 짧은 해시도 중복 검사가 필요합니다. 무충돌을 가정하지 않습니다.
+
+## 킷 개발·배포
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 scripts/release_package.py
+# dist/AOAgentDocs_v1.3.0.zip
+```
+
+[배포 정책](RELEASE_POLICY.md) · [변경 이력](CHANGELOG.md) · [로드맵](ROADMAP.md)
+
+ZIP은 [명시적 payload 목록](kit-files.json)만 포함합니다. 원본 저장소의 제품 이력·tests·로컬
+노트·에이전트 런타임은 배포하지 않습니다. POSIX/PowerShell wrapper도 동일한 Python packager를 씁니다.
+
+첫 도입 검증: AOCortexAPI의 server+iOS, 향후 Android를 대상으로 검증합니다.
+자세한 개발/검증 기록은 원본 저장소 docs에 남기며 킷 사용자에게 강제로 설치하지 않습니다.

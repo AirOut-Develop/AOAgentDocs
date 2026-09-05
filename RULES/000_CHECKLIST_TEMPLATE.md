@@ -1,6 +1,6 @@
 # ✅ 에이전트 온보딩 체크리스트 (Agent Onboarding Checklist)
 
-> 이 체크리스트를 복사하여 `ONBOARDING.md` 또는 개인 메모리 파일(예: `CLAUDE.md`, `AGENTS.md`)에 작성하세요.
+> 이 체크리스트를 복사하여 작업 문서의 온보딩 절에 작성하세요.
 > 체크박스([x])를 모두 채운 후 작업을 시작합니다.
 
 ## 🤖 [Agent Name / Session ID]
@@ -21,3 +21,6 @@
 - [ ] 규칙 충돌 시 PLATFORM > COMMON 우선순위를 적용합니다.
 - [ ] 충돌 발견 시 `[RULE-CONFLICT]`로 즉시 보고합니다.
 - [ ] 작업 완료 전 빌드/테스트 등 검증을 수행합니다.
+
+- [ ] [제품 생명주기](COMMON/DOCUMENT_LIFECYCLE.md)를 확인하고 활성/계획 플랫폼을 구분했습니다.
+- [ ] iOS 대상이면 [iOS 지침](PLATFORM/IOS/ARCHITECTURE.md)을 확인했습니다.

@@ -1,45 +1,31 @@
-# 📦 AOAgentDocs 릴리즈 정책
+# AOAgentDocs 릴리스 정책
 
-## 1. 목적
-- AOAgentDocs를 팀/외부에 배포 가능한 형태로 안정적으로 관리합니다.
-- 변경 이력을 추적 가능하게 유지하고, 회귀/혼입 리스크를 낮춥니다.
+## 버전
+- MAJOR: 기존 계약/구조의 비호환 변경.
+- MINOR: 기존 기록을 유지하는 선택적 기능/가이드 추가 (이번 1.3.0).
+- PATCH: 버그·문구·링크 수정.
+- VERSION이 정본이며 README/CHANGELOG/ROADMAP을 함께 갱신한다.
 
-## 2. 버전 정책 (SemVer)
-- `MAJOR`: 호환 불가 구조 변경 (예: 폴더 규칙 대폭 변경)
-- `MINOR`: 하위 호환 기능/가이드 추가
-- `PATCH`: 오탈자/링크/문구 수정 등 경미한 보정
+## 태그와 산출물
+- 태그: `aodocs/vX.Y.Z`
+- ZIP: `dist/AOAgentDocs_vX.Y.Z.zip`, 내부 root `AOAgentDocs/`.
+- `python3 scripts/release_package.py`가 kit-files.json의 명시 목록만 포함한다.
+- POSIX: `bash scripts/release_package.sh`, Windows: `pwsh -File scripts/release_package.ps1`.
+- Windows wrapper에는 Python 3.10+가 필요하다. 확인하지 않은 OS 실행 결과는 미검증으로 남긴다.
 
-예시:
-- `1.1.0` → 릴리즈 관리 체계 도입
-- `2.0.0` → 클린 아키텍처 가이드 정식 포함(예정)
+## 릴리스 게이트
+1. 테스트를 먼저 작성하고 실패→수정→통과 기록을 남긴다.
+2. `python3 -m unittest discover -s tests -v`와 Python 문법/shell syntax 검사를 수행한다.
+3. 배포 문서 상대 링크와 버전 일관성을 점검한다.
+4. ZIP을 풀어 신규 설치/dry-run/멱등성/관리 파일 충돌/legacy 파일 보존/validate를 시험한다.
+5. 비밀/PII/실제 제품 로그가 payload에 없음을 검토한다. hash는 시크릿 감사를 대체하지 않는다.
+6. 실제 소비자 도입에서 기존 코드·문서 보존과 등록 문서 검증을 확인한다.
+7. source commit과 검증 기록을 커밋하고 태그를 만든다. 공개 상태는 push/업로드 후 따로 확인한다.
 
-## 3. 태그/산출물 규칙
-- Git 태그: `aodocs/vX.Y.Z`
-- 배포 파일: `AOAgentDocs_vX.Y.Z.zip`
-- 릴리즈 노트: `CHANGELOG.md`의 해당 버전 섹션을 기준으로 작성
+## 제외와 한계
 
-## 4. 릴리즈 체크리스트
-1. `VERSION`을 목표 버전으로 갱신
-2. `CHANGELOG.md`에 변경 사항 기록 (`Unreleased` 정리)
-3. 링크 무결성 검사 (깨진 상대 링크 0건)
-4. 핵심 문서 일관성 점검 (`README`, `CONTRIBUTING`, `MIGRATION_PROMPT`, `RULES/COMMON/*`)
-5. 보안 감사 수행 (아래 `보안 감사 게이트` 항목 충족 필수)
-6. 릴리즈 커밋 생성
-7. Git 태그 생성 (`aodocs/vX.Y.Z`)
-8. `scripts/release_package.sh`로 `AOAgentDocs_vX.Y.Z.zip` 생성 및 배포 채널 업로드
-
-## 5. 보안 감사 게이트 (필수)
-- 하드코딩된 시크릿(API Key, Token, Password, Private Key) 유출이 0건이어야 합니다.
-- 개인식별정보(PII) 또는 내부 민감 정보가 샘플/템플릿에 포함되지 않아야 합니다.
-- 배포 산출물(zip)에 불필요한 로컬/런타임 파일(`.omc`, `.codex`, `.idea`, 개인 로그)이 포함되지 않아야 합니다.
-- 보안 이슈가 발견되면 `CHANGELOG.md`의 `Unreleased`에 기록하고, 해결 완료 전 릴리즈를 금지합니다.
-
-## 6. 핫픽스 정책
-- 배포 후 치명 오탈자/링크 오류 발견 시 `PATCH` 릴리즈를 즉시 발행합니다.
-- 핫픽스도 동일하게 `VERSION`, `CHANGELOG`, 태그를 동기화합니다.
-- 보안 취약점 핫픽스는 최우선 처리하고 일반 패치보다 먼저 배포합니다.
-
-## 7. v2.0 준비 조건
-- 클린 아키텍처 문서 초안 100% 작성
-- 아키텍처 용어집/검증 체크리스트/ADR 템플릿 포함
-- 기존 communication 규칙과 충돌 없음 검증
+킷 배포에 `.git`, `.omc`, `.omx`, `.codex`, `.superpowers`, 로컬 환경·노트,
+제품 docs 이력·tests·서버 데이터는 포함하지 않는다. 명시 목록의 추가도 보안 검토 대상이다.
+validate는 기록된 evidence와 링크를 검사할 뿐 실제 제품 테스트/승인 진위를 확인하지 않는다.
+기존 root 설치/조직 포크를 자동으로 병합하지 않는다. 동시 설치/원자적 rollback은 지원하지 않는다.
+실패 시 변경 목록과 Git diff를 확인한 뒤 정확한 범위에서 복구한다.

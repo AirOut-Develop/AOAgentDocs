@@ -2,6 +2,20 @@
 
 이 문서는 AOAgentDocs의 릴리즈 이력을 관리합니다.
 
+## [1.3.0] - 2026-09-05
+### Added
+- PRD/설계/ADR/계획/검증/릴리스 연결 규약과 선택적 registry
+- iOS 규칙, 복수 활성/계획 플랫폼
+- 비파괴 namespaced 설치·upgrade 및 문서 검사 CLI (Python 표준 라이브러리)
+- installer/validator/ZIP 소비자 roundtrip 회귀 테스트
+### Changed
+- root 복사/덮어쓰기 대신 `.aodocs/kit` 설치를 기본 경로로 제공 (legacy 파일 보존)
+- 동일 Python packager와 명시 payload 목록으로 ZIP 생성, 로컬 산출물 혼입 방지
+- 현재 버전/로드맵/감사 안내 동기화, 해시 무충돌 가정 제거
+### Compatibility
+- 기존 WRK/ISS/END와 root `.aodocs_version` 보존. 자동 재명명/이관 없음.
+- 새 설치 버전은 `.aodocs/manifest.json`에서 관리. 문서 검사와 실제 기능 검증은 별개.
+
 ## [1.2.0] - 2026-02-09
 ### Added
 - WRK(작업 보고서) 체계 신설: `WRK_YYMMDD_NNN_hash_Name` 형식

@@ -1,7 +1,7 @@
 # 📜 Antigravity Standard Rules Index
 
 ## ⚖️ 규칙 우선순위 및 충돌 해결 (Priority & Conflict)
-에이전트는 다음 우선순위를 따릅니다.
+프로젝트 자체 지침과 상위 지침이 우선합니다. 선택한 범위 안에서는 다음 순서를 따릅니다.
 1. 플랫폼별 지침 (PLATFORM)
 2. 공통 지침 (COMMON)
 
@@ -23,3 +23,9 @@
 
 ### Server (Placeholder)
 - [ARCHITECTURE.md](./PLATFORM/SERVER/ARCHITECTURE.md): 서버 아키텍처 (예정)
+
+## 제품 생명주기
+- [DOCUMENT_LIFECYCLE.md](COMMON/DOCUMENT_LIFECYCLE.md) — PRD/계획/검증 연결
+
+## iOS
+- [ARCHITECTURE.md](PLATFORM/IOS/ARCHITECTURE.md) — 네이티브 적용 규칙

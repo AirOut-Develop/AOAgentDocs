@@ -1,54 +1,21 @@
-[안티그래비티 표준 문서 시스템 이식 요청 프롬프트 (v4.0)]
+[AOAgentDocs 1.3 신규/선택 이관]
 
-## 0. 프로젝트 설정
-- 대상 경로: `<INSERT_PROJECT_ROOT_PATH>`
-- 플랫폼: Android / Web / Server
+대상 프로젝트와 원본 킷의 Git root/remote/dirty 상태를 먼저 확인한다.
+기존 프로젝트 지침을 읽고 원본 킷은 대상 디렉터리 바깥에서 실행한다.
+Python 3.10+ 표준 라이브러리를 사용한다.
 
-## 1. 문서 킷 복사
-- `CONTRIBUTING.md`
-- `RULES/`
-- `examples/`
+1. python3 scripts/aodocs.py install TARGET --profile server --profile ios
+   기본 dry-run을 검토한다. 필요한 platform은 server/ios/android/web 중 복수 선택.
+2. 같은 명령에 --apply를 추가한다.
+3. .aodocs/kit(관리 파일), manifest.json(설치 버전/hash), project.json/documents.json(사용자 소유)을 확인한다.
+4. 향후 플랫폼은 project.json planned_platforms에 둔다. 초기 --profile은 활성 플랫폼이다.
+5. 기존 RULES/AGENTS/CLAUDE/README/CONTRIBUTING/.aodocs_version과 docs 이력은 덮어쓰지 않는다.
+6. templates에서 필요한 PRD/계획/검증만 실제 docs에 복사하고 documents.json에 연결한다.
+7. 프로젝트 문서 지도에 킷 지침/registry의 상대 링크를 추가한다. 자동 규칙 승격은 하지 않는다.
+8. python3 scripts/aodocs.py validate TARGET
+9. 실제 제품 테스트는 별도로 실행하고 미검증 항목을 그대로 남긴다.
 
-## 2. 플랫폼 규칙 확정
-- `CONTRIBUTING.md`의 플랫폼 블록을 프로젝트 유형에 맞게 수정
-
-## 3. communication 초기화
-아래 템플릿을 프로젝트의 `docs/communication/`으로 복사
-- `examples/communication/000_README_Communication_Guide.md`
-- `examples/communication/001_INDEX.md`
-- `examples/communication/000_Master_Report_Template.md`
-- `examples/communication/000_Work_Master_Report_Template.md`
-- `examples/communication/ISS_YYMMDD_NNN_hash_Flag_Name_Template.md`
-- `examples/communication/WRK_YYMMDD_NNN_hash_Name_Template.md`
-- `examples/communication/999_Issue_Completed_Template.md`
-- `examples/communication/999_Work_Completed_Template.md`
-- `examples/communication/assets/001_Attempt_Log_Template.md`
-- `examples/communication/assets/raw_logs.txt`
-- `docs/communication/works/` 폴더 생성
-- `docs/communication/issues/` 폴더 생성
-- `docs/communication/END/` 폴더 생성
-
-## 4. 운영 규칙
-- 루트(`docs/communication/`)에는 인덱스/가이드/템플릿과 `works/`, `issues/`, `END/`만 유지
-- 작업 폴더: `works/WRK_YYMMDD_NNN_hash_Name`
-- 이슈 폴더: `issues/ISS_YYMMDD_NNN_hash_Flag_Name`
-  - `Flag`: `L`(WRK 연계, 부모 해시 필수) / `S`(독립)
-- 해시: 6자리 hex (`YYMMDD+HHMMSS+random 2자리`의 SHA-256 앞 6자리)
-- NNN: 해당 날짜 내 순서 (WRK/ISS 독립 카운트)
-- 완료 시 `999_Completed.md` 작성 후 즉시 `END/`로 이동
-- 인덱스 `001_INDEX.md`는 WRK+ISS 통합 관리, 항상 최신 유지
-
-## 5. 완료 검증
-- 링크 무결성
-- 네이밍 규칙 준수
-- 인덱스(활성/완료) 최신화
-
-## 6. 버전 마커 설치
-- 프로젝트 루트에 `.aodocs_version` 파일을 생성합니다.
-- 내용: 현재 설치한 AOAgentDocs 버전 (예: `1.2.0`)
-- 이 파일은 향후 `UPGRADE_PROMPT.txt`에서 버전 비교에 사용됩니다.
-- `.aodocs_version`이 `.gitignore`에 포함되지 않도록 확인합니다.
-
-## 7. 향후 업그레이드
-- AOAgentDocs가 업데이트되면 `UPGRADE_PROMPT.txt`를 사용하여 업그레이드합니다.
-- 이 파일(`MIGRATION_PROMPT.txt`)은 최초 설치 전용입니다.
+.aodocs/는 Git 추적 대상이며 비밀/개인 로그를 넣지 않는다.
+root의 옛 .aodocs_version은 legacy root 복사본의 버전이다. 새 설치 버전은 .aodocs/manifest.json이 정본.
+설치기는 source/target 중첩, symlink, 경로 탈출, 기존 관리 파일 수정 충돌을 거부한다.
+원자적 동시 설치는 지원하지 않는다. 중단되면 diff 확인 후 복구하고 동시 실행하지 않는다.
