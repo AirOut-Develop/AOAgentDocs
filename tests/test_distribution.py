@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -142,6 +143,7 @@ class DistributionTests(unittest.TestCase):
             cli = ROOT / "scripts/aodocs.py"
             result = subprocess.run([sys.executable, str(cli), "install", str(target), "--apply"], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+
             subprocess.run(["git", "add", "."], cwd=target, check=True, capture_output=True)
             check = subprocess.run(["git", "diff", "--cached", "--check"], cwd=target, capture_output=True, text=True)
             self.assertEqual(check.returncode, 0, check.stdout)
@@ -155,6 +157,41 @@ class DistributionTests(unittest.TestCase):
             subprocess.run(["git", "-c", "core.autocrlf=true", "clone", "-q", str(target), str(clone)], check=True)
             result = subprocess.run([sys.executable, str(clone / ".aodocs/kit/scripts/aodocs.py"), "validate", str(clone)], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_published_130_autocrlf_checkout_upgrades_without_losing_edits(self):
+        legacy_zip = ROOT / "tests/fixtures/AOAgentDocs_v1.3.0.zip"
+        self.assertEqual(hashlib.sha256(legacy_zip.read_bytes()).hexdigest(),
+                         "afcd1987981e3678ae4f96d57d345d08e78f16973c628962148469b95d689319")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            with zipfile.ZipFile(legacy_zip) as z:
+                z.extractall(tmp / "old")
+            old_cli = tmp / "old/AOAgentDocs/scripts/aodocs.py"
+            target = tmp / "consumer"
+            target.mkdir()
+            subprocess.run(["git", "init", "-q", str(target)], check=True)
+            result = subprocess.run([sys.executable, str(old_cli), "install", str(target), "--apply"], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            subprocess.run(["git", "add", "."], cwd=target, check=True, capture_output=True)
+            subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "legacy fixture"], cwd=target, check=True)
+            checkout = tmp / "checkout"
+            subprocess.run(["git", "-c", "core.autocrlf=true", "clone", "-q", str(target), str(checkout)], check=True)
+            cli = ROOT / "scripts/aodocs.py"
+            before = (checkout / ".aodocs/kit/VERSION").read_bytes()
+            self.assertIn(b"\r\n", before)
+            result = subprocess.run([sys.executable, str(cli), "install", str(checkout)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("repair line endings", result.stdout)
+            self.assertEqual((checkout / ".aodocs/kit/VERSION").read_bytes(), before)
+            result = subprocess.run([sys.executable, str(cli), "install", str(checkout), "--apply"], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            subprocess.run(["git", "add", "."], cwd=checkout, check=True, capture_output=True)
+            subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "upgrade fixture"], cwd=checkout, check=True)
+            final = tmp / "final"
+            subprocess.run(["git", "-c", "core.autocrlf=true", "clone", "-q", str(checkout), str(final)], check=True)
+            result = subprocess.run([sys.executable, str(final / ".aodocs/kit/scripts/aodocs.py"), "validate", str(final)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
 
 
 if __name__ == "__main__":

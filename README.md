@@ -101,3 +101,5 @@ ZIP은 [명시적 payload 목록](kit-files.json)만 포함합니다. 원본 저
 Windows Git `core.autocrlf`가 관리 파일의 바이트를 바꿔 hash 검사가 실패하는 문제를
 `.aodocs/.gitattributes`로 방지합니다. 이 파일은 직접 변경하지 않으며 충돌 시 설치를 중단합니다.
 1.3.0 태그는 보존하고 1.3.1에서 실제 Git add/commit/clone 후 무결성을 검증했습니다.
+이미 줄바꿈이 변환된 1.3.0 checkout도 기존 hash와 정확히 대조해 줄바꿈만 복구합니다.
+dry-run에 `repair line endings`가 표시되며 실제 내용 변경은 자동으로 덮어쓰지 않습니다.

@@ -8,6 +8,7 @@
 - `.aodocs/.gitattributes`로 킷과 속성 파일 자체의 줄바꿈 변환 방지
 - 신규 속성 파일의 dry-run/충돌/symlink 보호와 1.3.1 무결성 검사
 - `core.autocrlf=true` 환경의 실제 git add/commit/clone/validate 회귀
+- 이미 줄바꿈 변환된 정확히 1.3.0 checkout을 기존 hash와 대조해 제한적으로 복구
 ### Compatibility
 - 1.3.0 태그·산출물은 그대로 보존. 최신 install로 namespaced kit만 갱신.
 

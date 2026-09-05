@@ -223,6 +223,50 @@ class InstallTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.apply()
 
+    def test_upgrade_from_1_3_0_repairs_lf_payload_checked_out_as_crlf(self):
+        self.apply()
+        managed = self.target / ".aodocs/kit/README.md"
+        managed.write_bytes(managed.read_bytes().replace(b"\n", b"\r\n"))
+        self.write_source({"VERSION": b"1.3.1\n", "README.md": b"new readme\n", "RULES/common.md": b"rules\n"})
+
+        actions = install(self.source, self.target, [], apply=False)
+        self.assertIn("repair line endings .aodocs/kit/README.md", actions)
+        self.apply()
+
+        self.assertEqual(b"new readme\n", managed.read_bytes())
+        self.assertEqual("1.3.1", self.manifest()["kit_version"])
+
+    def test_upgrade_from_1_3_0_repairs_crlf_payload_checked_out_as_lf(self):
+        self.write_source({"VERSION": b"1.3.0\n", "README.md": b"kit readme\r\n", "RULES/common.md": b"rules\n"})
+        self.apply()
+        managed = self.target / ".aodocs/kit/README.md"
+        managed.write_bytes(b"kit readme\n")
+        self.write_source({"VERSION": b"1.3.1\n", "README.md": b"new readme\n", "RULES/common.md": b"rules\n"})
+
+        actions = install(self.source, self.target, [], apply=False)
+        self.assertIn("repair line endings .aodocs/kit/README.md", actions)
+        self.apply()
+
+        self.assertEqual(b"new readme\n", managed.read_bytes())
+
+    def test_same_version_1_3_0_does_not_recover_line_ending_mismatch(self):
+        self.apply()
+        managed = self.target / ".aodocs/kit/README.md"
+        managed.write_bytes(managed.read_bytes().replace(b"\n", b"\r\n"))
+
+        with self.assertRaises(ValueError):
+            self.apply()
+
+    def test_versions_other_than_1_3_0_do_not_recover_line_ending_mismatch(self):
+        self.write_source({"VERSION": b"1.2.9\n", "README.md": b"kit readme\n", "RULES/common.md": b"rules\n"})
+        self.apply()
+        managed = self.target / ".aodocs/kit/README.md"
+        managed.write_bytes(managed.read_bytes().replace(b"\n", b"\r\n"))
+        self.write_source({"VERSION": b"1.3.1\n", "README.md": b"new readme\n", "RULES/common.md": b"rules\n"})
+
+        with self.assertRaises(ValueError):
+            self.apply()
+
     def test_unowned_existing_payload_accepts_only_identical_bytes(self):
         path = self.target / ".aodocs/kit/README.md"
         path.parent.mkdir(parents=True)

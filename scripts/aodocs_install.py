@@ -20,6 +20,12 @@ def _sha256(contents: bytes) -> str:
     return hashlib.sha256(contents).hexdigest()
 
 
+def _matches_hash_after_git_line_ending_conversion(contents: bytes, expected_hash: str) -> bool:
+    as_lf = contents.replace(b"\r\n", b"\n")
+    as_crlf = as_lf.replace(b"\n", b"\r\n")
+    return _sha256(as_lf) == expected_hash or _sha256(as_crlf) == expected_hash
+
+
 def _read_json(path: Path) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -185,8 +191,10 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
             raise ValueError("existing .aodocs/.gitattributes conflicts with installer policy")
     old_manifest = _load_existing_manifest(manifest_path)
     old_files, installed_version = old_manifest if old_manifest is not None else ({}, None)
-    if installed_version is not None and _parse_version(version, "VERSION") < installed_version:
+    source_version = _parse_version(version, "VERSION")
+    if installed_version is not None and source_version < installed_version:
         raise ValueError("kit downgrade is not allowed")
+    allow_line_ending_repair = installed_version == (1, 3, 0) and source_version >= (1, 3, 1)
 
     removed = sorted(set(old_files) - set(files))
     if removed:
@@ -204,12 +212,19 @@ def install(source: Path, target: Path, profiles: list[str], apply: bool) -> lis
             if not destination.is_file():
                 raise ValueError(f"managed path is not a file: {destination}")
             existing = destination.read_bytes()
+            repaired_line_endings = False
             if relative in old_files:
                 if _sha256(existing) != old_files[relative]:
-                    raise ValueError(f"managed file was locally modified: {relative}")
+                    if allow_line_ending_repair and _matches_hash_after_git_line_ending_conversion(
+                        existing, old_files[relative]
+                    ):
+                        repaired_line_endings = True
+                        actions.append(f"repair line endings {managed_relative}")
+                    else:
+                        raise ValueError(f"managed file was locally modified: {relative}")
             elif existing != source_contents[relative]:
                 raise ValueError(f"unowned file conflicts with payload: {relative}")
-            if existing != source_contents[relative]:
+            if existing != source_contents[relative] and not repaired_line_endings:
                 actions.append(f"update {managed_relative}")
         else:
             if relative in old_files:

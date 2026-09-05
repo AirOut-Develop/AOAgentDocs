@@ -17,3 +17,7 @@ v1.2 root 복사 설치에서 올 때는 .aodocs/kit만 추가한다. legacy 파
 
 1.3.0→1.3.1은 namespaced .gitattributes를 추가한다. 최종 validate 외에 Git에 등록한 바이트도 보존한다.
 이 속성 파일도 사용자 편집과 충돌하면 중단한다. root .gitattributes는 변경하지 않는다.
+
+예외는 이미 Git 줄바꿈 변환을 겪은 정확히 1.3.0 설치본을 1.3.1 이상으로 올릴 때뿐이다.
+LF/CRLF 변환만으로 기존 manifest의 SHA-256과 정확히 일치하는 파일은 `repair line endings`로
+명시하고 복구한다. 실제 내용 수정, 다른 설치 버전, 동일 1.3.0 재설치는 여전히 충돌이다.
