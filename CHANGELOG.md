@@ -2,6 +2,17 @@
 
 이 문서는 AOAgentDocs의 릴리즈 이력을 관리합니다.
 
+## [1.4.1] - 2026-09-08
+### Added
+- `RULES/COMMON/SESSION_HANDOFF.md`: 리드 1 + 구현·문서·PRD·검증 3패널 상주 운영 구조
+- 리드가 태스크만 배분하고 저작/검증 패널을 분리하는 규칙, 파일 소유 패널 명시
+- 리드 메인 : 우측 패널 열 = 6 : 4 너비와 우측 3등분 고정 순서, tmux 예시
+### Changed
+- `examples/lifecycle/STATUS.md`: 지금 할 일과 대기열에 담당 패널 항목 추가
+### Compatibility
+- 기존 registry, PRD/PLAN/WRK/ISS, root 규칙과 프로젝트 문서는 변경하지 않음.
+- 패널 구조는 권장 운영 방식이며 단일 세션 사용을 막지 않음.
+
 ## [1.4.0] - 2026-09-05
 ### Added
 - `RULES/COMMON/SESSION_HANDOFF.md`: 새 세션 시작·종료·현황보고 규칙

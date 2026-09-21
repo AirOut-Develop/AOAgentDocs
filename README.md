@@ -1,6 +1,6 @@
 # AOAgentDocs
 
-**1.4.0 · PRD부터 개발·검증·배포·다음 세션까지 연결하는 재사용 문서 킷**
+**1.4.1 · PRD부터 개발·검증·배포·다음 세션까지 연결하는 재사용 문서 킷**
 
 WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실제 검증 근거를 연결합니다.
 서버/iOS/Android/Web을 함께 선택할 수 있습니다. UI 프레임워크나 에이전트 실행 도구를 강제하지 않습니다.
@@ -10,7 +10,7 @@ WRK(작업)·ISS(이슈)의 기록 체계를 유지하며, 요구사항과 실�
 Python **3.10 이상**이 필요하며 추가 패키지는 없습니다. 먼저 신뢰할 수 있는 소스를 확인하세요.
 
 ```bash
-git clone --branch aodocs/v1.4.0 --depth 1 https://github.com/AirOut-Develop/AOAgentDocs.git
+git clone --branch aodocs/v1.4.1 --depth 1 https://github.com/AirOut-Develop/AOAgentDocs.git
 cd AOAgentDocs
 # 태그가 고정된 검토 사본에서 설치합니다. 새 버전은 새 다운로드에서 먼저 검토하세요.
 python3 scripts/aodocs.py install /path/to/project --profile server --profile ios
@@ -89,7 +89,7 @@ AOAgentDocs 1.4를 이 프로젝트에 비파괴 설치해주세요.
 ```bash
 python3 -m unittest discover -s tests -v
 python3 scripts/release_package.py
-# dist/AOAgentDocs_v1.4.0.zip
+# dist/AOAgentDocs_v1.4.1.zip
 ```
 
 [배포 정책](RELEASE_POLICY.md) · [변경 이력](CHANGELOG.md) · [로드맵](ROADMAP.md)
@@ -113,3 +113,9 @@ dry-run에 `repair line endings`가 표시되며 실제 내용 변경은 자동�
 `docs/STATUS.md`는 지금 바로 할 일 한 개, 전체 등록 문서 현황, 완료 범위, 후속 대기열과
 미검증 항목을 연결합니다. 상태 정본은 계속 registry와 각 문서이며 STATUS는 대시보드입니다.
 현황보고 때 PRD/PLAN/WRK/ISS/verification/release 전체와 0건인 유형까지 표시합니다.
+
+### 1.4.1 상주 패널 운영 구조
+
+리드 세션은 직접 편집하지 않고 태스크만 배분하며, 구현 · 문서·PRD · 검증 세 패널을
+상주시킵니다. 화면은 리드 메인 영역과 우측 패널 열을 6 : 4로 두고 우측을 3등분합니다.
+저작과 검증을 같은 패널에서 끝내지 않으며 완료는 정본 문서와 검증 결과로만 기록합니다.

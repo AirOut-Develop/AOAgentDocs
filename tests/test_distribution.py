@@ -129,6 +129,16 @@ class DistributionTests(unittest.TestCase):
         self.assertIn("0건", template)
         self.assertIn("미검증", template)
 
+    def test_resident_panel_structure_is_documented(self):
+        rule = (ROOT / "RULES/COMMON/SESSION_HANDOFF.md").read_text()
+        template = (ROOT / "examples/lifecycle/STATUS.md").read_text()
+        self.assertIn("상주 패널", rule)
+        for panel in ("구현", "문서·PRD", "검증"):
+            self.assertIn(panel, rule)
+        self.assertIn("6 : 4", rule)
+        self.assertIn("태스크", rule)
+        self.assertIn("담당 패널", template)
+
     def test_documented_templates_register_without_claiming_product_success(self):
         self.packager()(ROOT)
         with tempfile.TemporaryDirectory() as tmp:
